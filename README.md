@@ -27,3 +27,10 @@ npm install
 npm run start
 ```
 9. Go to localhost:8080 in any browser to see the alert message appear
+
+### Notes
+When the server is running (after running `npm run start`):
+- Updates to **www** will appear automatically
+- Updates to **rust files in src** appear after running `wasm-pack build` without taking down server
+
+If there are issues with **www** being recognized as a submodule after running step 4 (or in general), see this [link](https://stackoverflow.com/questions/1759587/un-submodule-a-git-submodule#answer-1789374)
