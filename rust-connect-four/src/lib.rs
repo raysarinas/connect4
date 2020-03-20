@@ -15,5 +15,5 @@ extern {
 
 #[wasm_bindgen]
 pub fn greet() {
-    alert("Hello, rust-connect-four test!");
+    alert("Hello, rust-connect-four!");
 }

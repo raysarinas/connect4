@@ -13,7 +13,7 @@
 2. `cd rust-connect-four`
 3. Run `wasm-pack build` to build the project. This should generate pkg directory
 4. Run `npm init wasm-app www`
-5. Go into the www directory and run `npm install` so all initial dependencies are installed
+5. Go into the **www directory** and run `npm install` so all initial dependencies are installed
 6. Add the following code into **package.json** file:
 ```json
 "dependencies": {
