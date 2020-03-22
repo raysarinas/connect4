@@ -3,30 +3,37 @@
   <head>
     <meta charset="utf-8">
     <title>Hello wasm-pack!</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>  
-    <script>
-      var canvas, context;
-      jQuery(document).ready(function () {
-        canvas = document.getElementById("gameboard");
-        context = canvas.getContext("2d");
-      
-        context.fillStyle = "#00bfff";
-        context.fillRect(0, 0, 640, 480);
-        // Circle
-        context.fillStyle = "white";
-        for (var i = 0; i < 6; i++) {
-          for (var j = 0; j < 7; j++) {
-            context.beginPath();
-            context.arc(50 + j * 90, 40 + i * 80, 28, 0, 2*Math.PI, false);
-            context.fill();
-          }
-        }
-      });
-      </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"> 
+    <script src="js/board.js"></script>
   </head>
   <body>
+    <nav id="sideNavigation" class="w3-sidebar w3-bar-block w3-teal" style="width: 25%">
+      <div class="w3-container">
+        <h3 class="w3-padding-64">
+          <b>Play Connect4 / TOOT-OTTO</b>
+        </h3>
+      </div>
+        <a href="#/Connect4Computer" class="w3-bar-item w3-button">How to Play Connect4</a>
+        <a href="#" class="w3-bar-item w3-button">Play Connect4 with Computer</a>
+        <a href="#" class="w3-bar-item w3-button">Play Connect4 with Another Human</a>
+        <br>
+        <br>
+        <a href="#" class="w3-bar-item w3-button">How to TOOT-OTTO</a>
+        <a href="#" class="w3-bar-item w3-button">Play TOOT-OTTO with Computer</a>
+        <a href="#" class="w3-bar-item w3-button">Play TOOT-OTTO with Another Human</a>
+        <br>
+        <br>
+        <a href="#" class="w3-bar-item w3-button">View Game History</a>
+        <a href="#" class="w3-bar-item w3-button">Score Board</a>
+    </nav>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
     <script src="./bootstrap.js"></script>
-    <canvas id="gameboard" height="480" width="640"></canvas>
+    <div style="margin-left: 25%; padding-left: 5%;">
+      <canvas id="gameboard" height="480" width="640"></canvas>
+      <br>
+      <div id="content"></div>
+    </div>
+    
   </body>
 </html>
