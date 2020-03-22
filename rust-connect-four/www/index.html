@@ -3,9 +3,30 @@
   <head>
     <meta charset="utf-8">
     <title>Hello wasm-pack!</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>  
+    <script>
+      var canvas, context;
+      jQuery(document).ready(function () {
+        canvas = document.getElementById("gameboard");
+        context = canvas.getContext("2d");
+      
+        context.fillStyle = "#00bfff";
+        context.fillRect(0, 0, 640, 480);
+        // Circle
+        context.fillStyle = "white";
+        for (var i = 0; i < 6; i++) {
+          for (var j = 0; j < 7; j++) {
+            context.beginPath();
+            context.arc(50 + j * 90, 40 + i * 80, 28, 0, 2*Math.PI, false);
+            context.fill();
+          }
+        }
+      });
+      </script>
   </head>
   <body>
     <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
     <script src="./bootstrap.js"></script>
+    <canvas id="gameboard" height="480" width="640"></canvas>
   </body>
 </html>
