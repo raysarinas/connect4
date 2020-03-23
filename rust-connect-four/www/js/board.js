@@ -16,7 +16,6 @@ $(document).ready(function () {
     }
 
     $('#sideNavigation a').click(function () {
-        console.log('click');
         $('#content').load(this.getAttribute('href').split('/')[1] + ".html");
     });
 });
