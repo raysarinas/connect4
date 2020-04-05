@@ -1,10 +1,12 @@
 use yew::{html, Component, ComponentLink, Html, InputData, ShouldRender};
 
+// MODEL
 pub struct Model {
     link: ComponentLink<Self>,
     value: String,
 }
 
+// CONTROLLER
 pub enum Msg {
     GotInput(String),
     Clicked,
@@ -33,6 +35,7 @@ impl Component for Model {
         true
     }
     
+    // VIEW
     fn view(&self) -> Html {
         html! {
             <div>
@@ -48,6 +51,64 @@ impl Component for Model {
                     {&self.value}
                 </div>
             </div>
+        }
+    }
+}
+
+
+impl Model {
+    // HTML FILES SHOULD GO HERE AND BE RE-WRITTEN I THINK
+    fn view_connect4_computer(&self) -> Html {
+        html! {
+
+        }
+    }
+
+    fn view_connect4_human(&self) -> Html {
+        html! {
+            
+        }
+    }
+
+    fn view_howto_connect4(&self) -> Html {
+        html! {
+            
+        }
+    }
+
+    fn view_toototto_computer(&self) -> Html {
+        html! {
+
+        }
+    }
+
+    fn view_toototto_human(&self) -> Html {
+        html! {
+            
+        }
+    }
+
+    fn view_howto_toototto(&self) -> Html {
+        html! {
+            
+        }
+    }
+
+    fn view_scoreboard(&self) -> Html {
+        html! {
+
+        }
+    }
+
+    fn view_human_player(&self) -> Html {
+        html! {
+            
+        }
+    }
+
+    fn view_main(&self) -> Html {
+        html! {
+            
         }
     }
 }
