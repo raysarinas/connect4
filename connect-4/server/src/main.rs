@@ -4,9 +4,19 @@
 #[macro_use]
 extern crate rocket;
 
-#[get("/")]
-fn index() {
+use std::io;
+use std::path::{Path, PathBuf};
 
+use rocket::response::NamedFile;
+
+#[get("/")]
+fn index() -> io::Result<NamedFile> {
+    NamedFile::open("static/index.html")
+}
+
+#[get("/<file..>")]
+fn files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("static/").join(file)).ok()
 }
 
 #[get("/games")]
@@ -38,7 +48,8 @@ fn delete_game(id: usize) {
 
 fn get_routes() -> Vec<rocket::Route> {
     routes![
-        index//,games
+        index,
+        files//,games
     ]
 }
 

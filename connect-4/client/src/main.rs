@@ -1,4 +1,5 @@
 use yew::{html, Component, ComponentLink, Html, InputData, ShouldRender};
+use yew::prelude::*;
 
 // MODEL
 pub struct Model {
@@ -114,5 +115,8 @@ impl Model {
 }
 
 fn main() {
-    yew::start_app::<Model>();
+    yew::initialize();
+    let app: App<Model> = App::new();
+    app.mount_to_body();
+    yew::run_loop();
 }

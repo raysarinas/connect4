@@ -4,17 +4,16 @@ set -e
 
 echo "building client"
 pushd client
-cargo web build --release --target=wasm32-unknown-unknown
+cargo web deploy
 popd
 echo "client build complete"
 
-cp client/target/wasm32-unknown-unknown/release/client.js server/static/client.js
-cp client/target/wasm32-unknown-unknown/release/client.wasm server/static/client.wasm
+cp client/target/deploy/* server/static/
 
 (
   echo "running server"
   cd server
-  cargo run --release
+  cargo run
 )
 
 
