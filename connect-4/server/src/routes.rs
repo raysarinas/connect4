@@ -15,7 +15,7 @@ use bson::UtcDateTime;
 use bson::oid::ObjectId;
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Game {
+pub struct Game {
     #[serde(rename = "_id")]  // Use MongoDB's special primary key field name when serializing
     pub id: Option<ObjectId>,
     pub gameNumber: Option<String>,
@@ -23,11 +23,11 @@ struct Game {
     pub Player1Name: Option<String>,
     pub Player2Name: Option<String>,
     pub WinnerName: Option<String>,
-    pub GameDate: UtcDateTime,
+    pub GameDate: Option<String>,
 }
 
 #[get("/games")]
-pub fn get_games(conn: Mongoose) -> content::Json<String> {
+pub fn get_all_games(conn: Mongoose) -> content::Json<String> {
     let coll = conn.collection("games");
     let mut cursor = coll
                     .find(Some(doc! {}), None)
@@ -45,28 +45,58 @@ pub fn get_games(conn: Mongoose) -> content::Json<String> {
     }
     
     content::Json(format!("[{}]", contents.join(",")))
-
-    // format!("HELLO? == {:?}", cursor.next().unwrap())
-    // get request find Game() entry from MongoDB
-    // handle error
-    // post request and get entry and return it?
 }
 
-#[post("/games")]
-pub fn create_game(conn: Mongoose) {
+#[post("/games", data = "<game>")]
+pub fn create_game(conn: Mongoose, game: Json<Game>) -> content::Json<String> {
+    let inner = game.into_inner();
+    let doc = doc! {
+        "gameNumber": inner.gameNumber.unwrap(),
+        "gameType": inner.gameType.unwrap(),
+        "Player1Name": inner.Player1Name.unwrap(),
+        "Player2Name": inner.Player2Name.unwrap(),
+        "WinnerName": inner.WinnerName.unwrap(),
+        "GameDate": inner.GameDate.unwrap(),
+    };
+    let test = doc.clone();
+    let coll = conn.collection("games");
+    let mut cursor = coll
+                    .insert_one(doc, None);
+    
+    content::Json(format!("INSERTED THE DOC = {:?}", test))
 }
 
-#[put("/games/<id>")]
-pub fn update_game(conn: Mongoose, id: String) {
+#[put("/games/<id>", data = "<game>")]
+pub fn update_game(conn: Mongoose, id: String, game: Json<Game>) -> content::Json<String> {
+    let inner = game.into_inner();
+    let coll = conn.collection("games");
 
+    let filter = doc!{ "_id": bson::oid::ObjectId::with_string(&id).unwrap()};
+    let update = doc!{"$set" => {"WinnerName" => inner.WinnerName.unwrap()}};
+
+    coll.update_one(filter.clone(), update, None).unwrap();
+
+    content::Json(format!("{:?}", filter))
 }
 
 #[get("/games/<id>")]
-pub fn get_game(conn: Mongoose, id: String) {
+pub fn get_game(conn: Mongoose, id: String) -> content::Json<String> {
+    let coll = conn.collection("games");
 
+    let mut gg = coll.find_one(Some(doc! { "_id": bson::oid::ObjectId::with_string(&id).unwrap() }), None)
+                    .expect("Document not found");
+
+    content::Json(format!("{:?}", gg))
 }
 
 #[delete("/games/<id>")]
-pub fn delete_game(conn: Mongoose, id: String) {
+pub fn delete_game(conn: Mongoose, id: String) -> content::Json<String> {
+    // let inner = game.into_inner();
+    let coll = conn.collection("games");
 
+    let filter = doc!{ "_id": bson::oid::ObjectId::with_string(&id).unwrap()};
+
+    coll.delete_one(filter.clone(), None).unwrap();
+
+    content::Json(format!("{:?}", filter))
 }
