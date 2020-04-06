@@ -10,6 +10,7 @@ use mongodb::coll::options;
 use mongodb::oid;
 
 use serde::{Serialize, Deserialize};
+use serde_json::ser;
 use bson::UtcDateTime;
 use bson::oid::ObjectId;
 
@@ -26,30 +27,24 @@ struct Game {
 }
 
 #[get("/games")]
-pub fn get_games(conn: Mongoose) -> String {
+pub fn get_games(conn: Mongoose) -> content::Json<String> {
     let coll = conn.collection("games");
-	let mut cursor = coll
+    let mut cursor = coll
                     .find(Some(doc! {}), None)
                     .ok()
                     .expect("Failed to execute find.");
-
-    // println!("{:?}", cursor);
-    let item = cursor.next();
-    // for result in cursor {
-    //     match result {
-    //         Ok(doc) => {
-    //             if let Some(doc) = document
-    //         },
-    //         _ => return format!("Uh...")
-    //     }
-    // }
-    match item {
-        Some(Ok(doc)) => {
-          println!("{:?}", doc);
-          format!("{:?}", doc)
+    let mut contents = Vec::new();
+    
+    for item in cursor {
+        match item {
+            Ok(doc) => if let Ok(d) = ser::to_string(&doc) {
+                contents.push(d);
+            },
+            Err(e) => println!("{:?}", e)
         }
-        _ => format!("Uh..."),
-      }
+    }
+    
+    content::Json(format!("[{}]", contents.join(",")))
 
     // format!("HELLO? == {:?}", cursor.next().unwrap())
     // get request find Game() entry from MongoDB
