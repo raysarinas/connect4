@@ -1,26 +1,22 @@
 #![feature(proc_macro_hygiene)]
 #![feature(decl_macro)]
 
-#[macro_use]
-extern crate rocket;
+#[macro_use] extern crate rocket;
+#[macro_use] extern crate rocket_contrib;
 
 use std::io;
 use std::path::{Path, PathBuf};
 
 use rocket::response::NamedFile;
-use bson::{Bson, doc, oid::ObjectId};
-use mongodb::{options::ClientOptions, Client, error::Error};
+// use bson::{Bson, doc, oid::ObjectId};
+// use mongodb::{options::ClientOptions, Client, error::Error};
 
-pub fn connect_to_db() -> Result<mongodb::Client, mongodb::error::Error> {
-    // Parse a connection string into an options struct.
-    let mut client_options = ClientOptions::parse("mongodb://localhost:27017")?;
+mod routes;
 
-    client_options.app_name = Some("Connect4".to_string());
+use rocket_contrib::databases::mongodb;
 
-    // Get a handle to the deployment.
-    // Create the client
-    Client::with_options(client_options)
-}
+#[database("mongoose")]
+pub struct Mongoose(mongodb::db::Database);
 
 #[get("/")]
 fn index() -> io::Result<NamedFile> {
@@ -34,23 +30,7 @@ fn files(file: PathBuf) -> Option<NamedFile> {
 
 #[get("/games")]
 fn games() -> String {
-    // format!("HELLO?")
-    let client = connect_to_db().unwrap();
-    let db = client.database("Connect4DB");
-    let coll = db.collection("games");
-    let mut cursor = coll
-                    .find(Some(doc! {}), None)
-                    .ok()
-                    .expect("Failed to execute find.");
-
-    let item = cursor.next();
-    match item {
-        Some(Ok(doc)) => {
-          println!("{:?}", doc);
-          format!("{:?}", doc)
-        }
-        _ => format!("Uh..."),
-      }
+    format!("HELLO?")
     // get request find Game() entry from MongoDB
     // handle error
     // post request and get entry and return it?
@@ -84,5 +64,8 @@ fn get_routes() -> Vec<rocket::Route> {
 
 fn main() {
     let routes = get_routes();
-    rocket::ignite().mount("/", routes).launch();
+    rocket::ignite()
+            .attach(Mongoose::fairing())
+            .mount("/", routes)
+            .launch();
 }
