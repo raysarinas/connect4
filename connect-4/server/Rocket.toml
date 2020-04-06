@@ -1,2 +1,2 @@
 [global.databases]
-mongoose = { url = "mongodb://localhost:27017" }
+mongoose = { url = "mongodb://localhost:27017/Connect4DB" }
