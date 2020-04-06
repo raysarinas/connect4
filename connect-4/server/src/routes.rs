@@ -14,6 +14,7 @@ use serde_json::ser;
 use bson::UtcDateTime;
 use bson::oid::ObjectId;
 
+// TODO: Move Game Struct so can be used by client/frontend
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Game {
     #[serde(rename = "_id")]  // Use MongoDB's special primary key field name when serializing
