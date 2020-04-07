@@ -85,18 +85,17 @@ impl Component for Model {
         };
         html! {
             <div>
-                <nav class="menu">
-                    <h2><b>{"Play Connect4 / TOOT-OTTO"}</b></h2>
-                    <a href="#/HowToConnect4" onclick=self.link.callback(|_| Msg::ClickedHowToC4)>{"How to Play Connect4"}</a><br></br>
-                    <a href="#/Connect4Computer" onclick=self.link.callback(|_| Msg::ClickedC4Comp)>{"Play Connect4 with Computer"}</a><br></br>
-                    <a href="#/Connect4Human" onclick=self.link.callback(|_| Msg::ClickedC4Human)>{"Play Connect4 with Another Human"}</a><br></br>
-                    <a href="#/HowToToot" onclick=self.link.callback(|_| Msg::ClickedHowToToot)>{"How to Play TOOT-OTTO"}</a><br></br>
-                    <a href="#/TootOttoComputer" onclick=self.link.callback(|_| Msg::ClickedTootComp)>{"Play Toot-Otto with Computer"}</a><br></br>
-                    <a href="#/TootOttoHuman" onclick=self.link.callback(|_| Msg::ClickedTootHuman)>{"Play Toot-Otto With Another Human"}</a><br></br>
-                    <a href="#/ScoreBoard" onclick=self.link.callback(|_| Msg::ClickedScoreBoard)>{"View Game History"}</a><br></br>
-                    <a href="#/Scores" onclick=self.link.callback(|_| Msg::ClickedScores)>{"Score Board"}</a>
+                <nav class="w3-sidenav w3-red w3-collapse w3-top w3-large w3-padding menu" style="z-index:3;width:350px;font-weight:bold" id="mySidenav">
+                    <a href="#/HowToConnect4" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedHowToC4)>{"How to Play Connect4"}</a><br></br>
+                    <a href="#/Connect4Computer" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedC4Comp)>{"Play Connect4 with Computer"}</a><br></br>
+                    <a href="#/Connect4Human" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedC4Human)>{"Play Connect4 with Another Human"}</a><br></br>
+                    <a href="#/HowToToot" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedHowToToot)>{"How to Play TOOT-OTTO"}</a><br></br>
+                    <a href="#/TootOttoComputer" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedTootComp)>{"Play Toot-Otto with Computer"}</a><br></br>
+                    <a href="#/TootOttoHuman" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedTootHuman)>{"Play Toot-Otto With Another Human"}</a><br></br>
+                    <a href="#/ScoreBoard" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedScoreBoard)>{"View Game History"}</a><br></br>
+                    <a href="#/Scores" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedScores)>{"Score Board"}</a>
                 </nav>
-                <div>
+                <div class="w3-main" style="margin-left:390px;margin-right:40px">
                     {view_tab()}
                 </div>
             </div>
