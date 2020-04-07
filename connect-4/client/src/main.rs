@@ -97,7 +97,19 @@ impl Model {
     // HTML FILES SHOULD GO HERE AND BE RE-WRITTEN I THINK
     fn view_howto_connect4(&self) -> Html {
         html! {
-            <p>{"How To Connect 4"}</p>
+            <div>
+                <h1><b>{"How to Play Connect 4"}</b></h1>
+                <p>
+                    {"Connect Four is a two-player connection game in which the players take turns dropping colored discs from the top into a seven-column, six-row vertically suspended grid. The objective of the game is to be the first to form a horizontal, vertical, or diagonal line of four of one's own discs."}
+                </p>
+                <h2>{"To play Connect 4 follow the following steps:"}</h2>
+                <ul>
+                    <li>{"A new game describes discs of which color belongs to which player"}</li>
+                    <li>{"Click on the desired column on the game board to place your disc"}</li>
+                    <li>{"Try to connect 4 of your colored discs either horizontally or vertically or diagonally"}</li>
+                </ul>
+                {"For More information on Connect 4 click "}<a href="https://en.wikipedia.org/wiki/Connect_Four">{"here"}</a>
+            </div>
         }
     }
 
@@ -115,7 +127,20 @@ impl Model {
 
     fn view_howto_toototto(&self) -> Html {
         html! {
-            <p>{"How to Toot Otto"}</p>
+            <div>
+                <h1><b>{"How to Play TOOT-OTTO"}</b></h1>
+                <p>
+                    {"TOOT-OTTO is a fun strategy game for older players who like tic-tac-toe and checkers. One player is TOOT and the other player is OTTO. Both players can place both T's and O's, based on their choice. The first player who spells his or her winning combination - horizontally, vertically or diagonally - wins!"}
+                </p>
+                <h2>{"To play TOOT-OTTO follow the following steps:"}</h2>
+                <ul>
+                    <li>{"A new game describes which player is TOOT and which is OTTO"}</li>
+                    <li>{"Select the disc type T or O that you want to place"}</li>
+                    <li>{"Click on the desired column on the game board to place your disc"}</li>
+                    <li>{"Try to spell TOOT or OTTO based on your winning combination, either horizontally or vertically or diagonally"}</li>
+                </ul>
+                {"For More information on TOOT-OTTO click "}<a href="https://boardgamegeek.com/boardgame/19530/toot-and-otto">{"here"}</a>
+            </div>
         }
     }
 
@@ -145,7 +170,15 @@ impl Model {
 
     fn view_main(&self) -> Html {
         html! {
-            
+            <div>
+                <h1><b>{"Welcome"}</b></h1>
+                <p>{"This application contains the following two board games, both in human vs. human and human vs. computer versions."}</p>
+                <ul>
+                    <li>{"Connect 4"}</li>
+                    <li>{"TOOT-OTTO"}</li>
+                </ul>
+                <p>{"Select the game of your choice above, and start playing. Enjoy!"}</p>
+            </div>
         }
     }
 }
