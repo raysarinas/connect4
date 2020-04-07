@@ -92,7 +92,6 @@ pub fn get_game(conn: Mongoose, id: String) -> content::Json<String> {
 
 #[delete("/games/<id>")]
 pub fn delete_game(conn: Mongoose, id: String) -> content::Json<String> {
-    // let inner = game.into_inner();
     let coll = conn.collection("games");
 
     let filter = doc!{ "_id": bson::oid::ObjectId::with_string(&id).unwrap()};

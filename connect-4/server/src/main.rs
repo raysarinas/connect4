@@ -23,16 +23,16 @@ fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/index.html")
 }
 
-// THIS BROKE WHEN DOING ID ROUTE STUFF
-// #[get("/<file..>")]
-// fn files(file: PathBuf) -> Option<NamedFile> {
-//     NamedFile::open(Path::new("static/").join(file)).ok()
-// }
+// TODO: look into ranks just in case it dies
+#[get("/<file..>", rank = 1)]
+fn files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("static/").join(file)).ok()
+}
 
 fn get_routes() -> Vec<rocket::Route> {
     routes![
         index,
-        // files,
+        files,
         routes::get_all_games,
         routes::create_game,
         routes::get_game,
