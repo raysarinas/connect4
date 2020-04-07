@@ -74,7 +74,10 @@ impl Component for Model {
         };
         html! {
             <div>
-                <nav class="w3-sidenav w3-red w3-collapse w3-top w3-large w3-padding menu" style="z-index:3;width:350px;font-weight:bold" id="mySidenav">
+                <nav class="w3-sidenav w3-red w3-collapse w3-top w3-large w3-padding menu" style="z-index:3;height:100%;width:350px;font-weight:bold" id="mySidenav">
+                    <div class="w3-container">
+                        <h3 class="w3-padding-64"><b>{"Play"}<br></br>{"Connect4 / TOOT-OTTO"}</b></h3>
+                    </div>
                     <a href="#/HowToConnect4" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedHowToC4)>{"How to Play Connect4"}</a><br></br>
                     <a href="#/Connect4Computer" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedC4Comp)>{"Play Connect4 with Computer"}</a><br></br>
                     <a href="#/Connect4Human" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedC4Human)>{"Play Connect4 with Another Human"}</a><br></br>
