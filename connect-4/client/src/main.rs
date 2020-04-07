@@ -1,12 +1,13 @@
 #![recursion_limit="512"]
 
-use yew::{html, Component, ComponentLink, Html, ShouldRender};
+use yew::{html, Component, ComponentLink, Html, InputData, ShouldRender};
 use yew::prelude::*;
 
 // MODEL
 pub struct Model {
     link: ComponentLink<Self>,
     tab: Tab,
+    player_name: String
 }
 
 pub enum Tab {
@@ -22,7 +23,6 @@ pub enum Tab {
 }
 
 // CONTROLLER
-// this is ugly lmao
 pub enum Msg {
     ClickedHowToC4,
     ClickedC4Comp,
@@ -31,7 +31,10 @@ pub enum Msg {
     ClickedTootComp,
     ClickedTootHuman,
     ClickedScoreBoard,
-    ClickedScores
+    ClickedScores,
+    GotPlayerName(String),
+    StartConnect4,
+    StartTootOtto
 }
 
 impl Component for Model {
@@ -41,7 +44,8 @@ impl Component for Model {
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         Model {
             link,
-            tab: Tab::Nothing
+            tab: Tab::Nothing,
+            player_name: "".into()
         }
     }
 
@@ -54,7 +58,14 @@ impl Component for Model {
             Msg::ClickedTootComp => self.tab = Tab::TootOttoComputer,
             Msg::ClickedTootHuman => self.tab = Tab::TootOttoHuman,
             Msg::ClickedScoreBoard => self.tab = Tab::ScoreBoard,
-            Msg::ClickedScores => self.tab = Tab::Scores
+            Msg::ClickedScores => self.tab = Tab::Scores,
+            Msg::GotPlayerName(name) => self.player_name = name,
+            Msg::StartConnect4 => {
+                // i think we call callback emit here idk
+            },
+            Msg::StartTootOtto => {
+                // i think we call callback emit here idk
+            }
         }
         true
     }
@@ -75,6 +86,7 @@ impl Component for Model {
         html! {
             <div>
                 <nav class="menu">
+                    <h2><b>{"Play Connect4 / TOOT-OTTO"}</b></h2>
                     <a href="#/HowToConnect4" onclick=self.link.callback(|_| Msg::ClickedHowToC4)>{"How to Play Connect4"}</a><br></br>
                     <a href="#/Connect4Computer" onclick=self.link.callback(|_| Msg::ClickedC4Comp)>{"Play Connect4 with Computer"}</a><br></br>
                     <a href="#/Connect4Human" onclick=self.link.callback(|_| Msg::ClickedC4Human)>{"Play Connect4 with Another Human"}</a><br></br>
@@ -94,7 +106,6 @@ impl Component for Model {
 
 
 impl Model {
-    // HTML FILES SHOULD GO HERE AND BE RE-WRITTEN I THINK
     fn view_howto_connect4(&self) -> Html {
         html! {
             <div>
@@ -115,7 +126,17 @@ impl Model {
 
     fn view_connect4_computer(&self) -> Html {
         html! {
-            <p>{"Connect 4 Computer"}</p>
+            <div>
+                <h1><b>{"Enter Your Name"}</b></h1>
+                <div>
+                    <input
+                        type="text"
+                        value=&self.player_name
+                        oninput=self.link.callback(|e: InputData| Msg::GotPlayerName(e.value))
+                        placeholder="Your Name"/>
+                    <button onclick=self.link.callback(|_| Msg::StartConnect4)>{"Start Game"}</button>
+                </div>
+            </div>
         }
     }
 
@@ -146,7 +167,17 @@ impl Model {
 
     fn view_toototto_computer(&self) -> Html {
         html! {
-            <p>{"Toot Otto Computer"}</p>
+            <div>
+                <h1><b>{"Enter Your Name"}</b></h1>
+                <div>
+                    <input
+                        type="text"
+                        value=&self.player_name
+                        oninput=self.link.callback(|e: InputData| Msg::GotPlayerName(e.value))
+                        placeholder="Your Name"/>
+                    <button onclick=self.link.callback(|_| Msg::StartTootOtto)>{"Start Game"}</button>
+                </div>
+            </div>
         }
     }
 
@@ -158,13 +189,13 @@ impl Model {
 
     fn view_scoreboard(&self) -> Html {
         html! {
-            <p>{"ScoreBoard"}</p>
+            <p>{"Game History"}</p>
         }
     }
 
     fn view_scores(&self) -> Html {
         html! {
-            <p>{"Scores"}</p>
+            <p>{"Score Board"}</p>
         }
     }
 
