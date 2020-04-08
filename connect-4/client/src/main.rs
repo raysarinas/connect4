@@ -5,6 +5,10 @@ use crate::routes::{
     connect4comp::Connect4Computer,
     connect4human::Connect4Human,
     howtotoot::HowToTootOtto,
+    tootottocomp::TootOttoComputer,
+    tootottohuman::TootOttoHuman,
+    gamehistory::GameHistory,
+    scoreboard::ScoreBoard,
     home::Home
 };
 
@@ -60,10 +64,14 @@ impl Component for Model {
                             AppRoute::Connect4Computer => html!{<Connect4Computer />},
                             AppRoute::Connect4Human => html!{<Connect4Human />},
                             AppRoute::HowToTootOtto => html!{<HowToTootOtto />},
+                            AppRoute::TootOttoComputer => html!{<TootOttoComputer />},
+                            AppRoute::TootOttoHuman => html!{<TootOttoHuman />},
+                            AppRoute::GameHistory => html!{<GameHistory />},
+                            AppRoute::ScoreBoard => html!{<ScoreBoard />},
                             AppRoute::Home => html!{<Home />},
                         }
                     } else {
-                        html!{<Home />}
+                        html!{"ERRRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"}
                     }
                 }
             </div>
