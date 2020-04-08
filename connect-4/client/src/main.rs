@@ -7,7 +7,8 @@ use yew::prelude::*;
 pub struct Model {
     link: ComponentLink<Self>,
     tab: Tab,
-    player_name: String
+    player1_name: String,
+    player2_name: String
 }
 
 pub enum Tab {
@@ -32,9 +33,12 @@ pub enum Msg {
     ClickedTootHuman,
     ClickedScoreBoard,
     ClickedScores,
-    GotPlayerName(String),
+    GotPlayer1Name(String),
+    GotPlayer2Name(String),
     StartConnect4,
-    StartTootOtto
+    StartConnect4Comp,
+    StartTootOtto,
+    StartTootOttoComp
 }
 
 impl Component for Model {
@@ -45,7 +49,8 @@ impl Component for Model {
         Model {
             link,
             tab: Tab::Nothing,
-            player_name: "".into()
+            player1_name: "".into(),
+            player2_name: "".into()
         }
     }
 
@@ -59,11 +64,18 @@ impl Component for Model {
             Msg::ClickedTootHuman => self.tab = Tab::TootOttoHuman,
             Msg::ClickedScoreBoard => self.tab = Tab::ScoreBoard,
             Msg::ClickedScores => self.tab = Tab::Scores,
-            Msg::GotPlayerName(name) => self.player_name = name,
+            Msg::GotPlayer1Name(name) => self.player1_name = name,
+            Msg::GotPlayer2Name(name) => self.player2_name = name,
             Msg::StartConnect4 => {
                 // i think we call callback emit here idk
             },
+            Msg::StartConnect4Comp => {
+                // i think we call callback emit here idk
+            },
             Msg::StartTootOtto => {
+                // i think we call callback emit here idk
+            },
+            Msg::StartTootOttoComp => {
                 // i think we call callback emit here idk
             }
         }
@@ -133,8 +145,8 @@ impl Model {
                 <div>
                     <input
                         type="text"
-                        value=&self.player_name
-                        oninput=self.link.callback(|e: InputData| Msg::GotPlayerName(e.value))
+                        value=&self.player1_name
+                        oninput=self.link.callback(|e: InputData| Msg::GotPlayer1Name(e.value))
                         placeholder="Your Name"/>
                     <button onclick=self.link.callback(|_| Msg::StartConnect4)>{"Start Game"}</button>
                 </div>
@@ -144,7 +156,22 @@ impl Model {
 
     fn view_connect4_human(&self) -> Html {
         html! {
-            <p>{"Connect 4 Human"}</p>
+            <div>
+                <h1><b>{"Enter Player Names"}</b></h1>
+                <div>
+                    <input
+                        type="text"
+                        value=&self.player1_name
+                        oninput=self.link.callback(|e: InputData| Msg::GotPlayer1Name(e.value))
+                        placeholder="Player 1's Name"/>
+                    <input
+                        type="text"
+                        value=&self.player2_name
+                        oninput=self.link.callback(|e: InputData| Msg::GotPlayer2Name(e.value))
+                        placeholder="Player 2's Name"/>
+                    <button onclick=self.link.callback(|_| Msg::StartConnect4Comp)>{"Start Game"}</button>
+                </div>
+            </div>
         }
     }
 
@@ -174,8 +201,8 @@ impl Model {
                 <div>
                     <input
                         type="text"
-                        value=&self.player_name
-                        oninput=self.link.callback(|e: InputData| Msg::GotPlayerName(e.value))
+                        value=&self.player1_name
+                        oninput=self.link.callback(|e: InputData| Msg::GotPlayer1Name(e.value))
                         placeholder="Your Name"/>
                     <button onclick=self.link.callback(|_| Msg::StartTootOtto)>{"Start Game"}</button>
                 </div>
@@ -185,7 +212,22 @@ impl Model {
 
     fn view_toototto_human(&self) -> Html {
         html! {
-            <p>{"Toot Otto Human"}</p>
+            <div>
+                <h1><b>{"Enter Player Names"}</b></h1>
+                <div>
+                    <input
+                        type="text"
+                        value=&self.player1_name
+                        oninput=self.link.callback(|e: InputData| Msg::GotPlayer1Name(e.value))
+                        placeholder="Player 1's Name"/>
+                    <input
+                        type="text"
+                        value=&self.player2_name
+                        oninput=self.link.callback(|e: InputData| Msg::GotPlayer2Name(e.value))
+                        placeholder="Player 2's Name"/>
+                    <button onclick=self.link.callback(|_| Msg::StartTootOttoComp)>{"Start Game"}</button>
+                </div>
+            </div>
         }
     }
 
