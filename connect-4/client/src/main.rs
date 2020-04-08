@@ -9,8 +9,7 @@ use crate::routes::{
     tootottohuman::TootOttoHuman,
     gamehistory::GameHistory,
     scoreboard::ScoreBoard,
-    home::Home,
-    fix_fragment_routes
+    home::Home
 };
 
 mod nav_bar;
@@ -22,37 +21,17 @@ use routes::*;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
-pub struct Model {
-    link: ComponentLink<Self>,
-    route: Option<AppRoute>
-}
-
-pub enum Msg {
-    Route(Route)
-}
+pub struct Model {}
 
 impl Component for Model {
-    type Message = Msg;
+    type Message = ();
     type Properties = ();
 
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let router_agent = RouteAgent::bridge(link.callback(Msg::Route));
-        let route_service: RouteService = RouteService::new();
-        let mut route = route_service.get_route();
-        fix_fragment_routes(&mut route);
-        Model {
-            link,
-            route: AppRoute::switch(route)
-        }
+        Model {}
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        match msg {
-            Msg::Route(mut route) => {
-                fix_fragment_routes(&mut route);
-                self.route = AppRoute::switch(route)
-            }
-        }
         true
     }
     
@@ -62,9 +41,9 @@ impl Component for Model {
             <div>
                 <NavigationBar />
                 <div class="w3-main" style="margin-left:390px;margin-right:40px">
-                {
-                    if let Some(route) = &self.route {
-                        match route {
+                <Router<AppRoute, ()>
+                    render = Router::render(|switch: AppRoute| {
+                        match switch {
                             AppRoute::HowToConnect4 => html!{<HowToConnect4 />},
                             AppRoute::Connect4Computer => html!{<Connect4Computer />},
                             AppRoute::Connect4Human => html!{<Connect4Human />},
@@ -75,10 +54,8 @@ impl Component for Model {
                             AppRoute::ScoreBoard => html!{<ScoreBoard />},
                             AppRoute::Home => html!{<Home />},
                         }
-                    } else {
-                        html!{"ERRRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"}
-                    }
-                }
+                    })
+                />
                 </div>
             </div>
         }

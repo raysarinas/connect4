@@ -15,32 +15,22 @@ use yew_router::prelude::*;
 /// App routes
 #[derive(Switch, Debug, Clone)]
 pub enum AppRoute {
-    #[to = "#/HowToConnect4"]
+    #[to = "/HowToConnect4"]
     HowToConnect4,
-    #[to = "#/Connect4Computer"]
+    #[to = "/Connect4Computer"]
     Connect4Computer,
-    #[to = "#/Connect4Human"]
+    #[to = "/Connect4Human"]
     Connect4Human,
-    #[to = "#/HowToToot"]
+    #[to = "/HowToToot"]
     HowToTootOtto,
-    #[to = "#/TootOttoComputer"]
+    #[to = "/TootOttoComputer"]
     TootOttoComputer,
-    #[to = "#/TootOttoHuman"]
+    #[to = "/TootOttoHuman"]
     TootOttoHuman,
-    #[to = "#/GameHistory"]
+    #[to = "/GameHistory"]
     GameHistory,
-    #[to = "#/ScoreBoard"]
+    #[to = "/ScoreBoard"]
     ScoreBoard,
-    #[to = "#/"]
+    #[to = "/"]
     Home
-}
-
-/// Fix fragment handling problem for yew_router
-pub fn fix_fragment_routes(route: &mut Route) {
-    let r = route.route.as_str();
-    if let Some(index) = r.find('#') {
-        route.route = r[index..].to_string();
-    } else {
-        route.route = "#/".to_string();
-    }
 }
