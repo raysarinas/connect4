@@ -26,17 +26,15 @@ impl Component for NavigationBar {
                     <div class="w3-container">
                         <h3 class="w3-padding-64"><b>{"Play"}<br></br>{"Connect4 / TOOT-OTTO"}</b></h3>
                     </div>
-                    <RouterAnchor<AppRoute> route=AppRoute::HowToConnect4 classes="nav-link w3-padding w3-hover-white">{"How to Play Connect 4"}</RouterAnchor<AppRoute>>
-                    <RouterAnchor<AppRoute> route=AppRoute::Connect4Computer classes="nav-link w3-padding w3-hover-white">{"Play Connect4 with Computer"}</RouterAnchor<AppRoute>>
-                    <RouterAnchor<AppRoute> route=AppRoute::Connect4Human classes="nav-link w3-padding w3-hover-white">{"Play Connect4 with Another Human"}</RouterAnchor<AppRoute>>
-                    <RouterAnchor<AppRoute> route=AppRoute::HowToTootOtto classes="nav-link w3-padding w3-hover-white">{"How to Play TOOT-OTTO"}</RouterAnchor<AppRoute>>
-                    <RouterAnchor<AppRoute> route=AppRoute::TootOttoComputer classes="nav-link w3-padding w3-hover-white">{"Play Toot-Otto with Computer"}</RouterAnchor<AppRoute>>
-                    <RouterAnchor<AppRoute> route=AppRoute::TootOttoHuman classes="nav-link w3-padding w3-hover-white">{"Play Toot-Otto With Another Human"}</RouterAnchor<AppRoute>>
-                    <RouterAnchor<AppRoute> route=AppRoute::GameHistory classes="nav-link w3-padding w3-hover-white">{"View Game History"}</RouterAnchor<AppRoute>>
+                    <RouterAnchor<AppRoute> route=AppRoute::HowToConnect4 classes="nav-link w3-padding w3-hover-white">{"How to Play Connect 4"}</RouterAnchor<AppRoute>><br></br>
+                    <RouterAnchor<AppRoute> route=AppRoute::Connect4Computer classes="nav-link w3-padding w3-hover-white">{"Play Connect4 with Computer"}</RouterAnchor<AppRoute>><br></br>
+                    <RouterAnchor<AppRoute> route=AppRoute::Connect4Human classes="nav-link w3-padding w3-hover-white">{"Play Connect4 with Another Human"}</RouterAnchor<AppRoute>><br></br>
+                    <RouterAnchor<AppRoute> route=AppRoute::HowToTootOtto classes="nav-link w3-padding w3-hover-white">{"How to Play TOOT-OTTO"}</RouterAnchor<AppRoute>><br></br>
+                    <RouterAnchor<AppRoute> route=AppRoute::TootOttoComputer classes="nav-link w3-padding w3-hover-white">{"Play Toot-Otto with Computer"}</RouterAnchor<AppRoute>><br></br>
+                    <RouterAnchor<AppRoute> route=AppRoute::TootOttoHuman classes="nav-link w3-padding w3-hover-white">{"Play Toot-Otto With Another Human"}</RouterAnchor<AppRoute>><br></br>
+                    <RouterAnchor<AppRoute> route=AppRoute::GameHistory classes="nav-link w3-padding w3-hover-white">{"View Game History"}</RouterAnchor<AppRoute>><br></br>
                     <RouterAnchor<AppRoute> route=AppRoute::ScoreBoard classes="nav-link w3-padding w3-hover-white">{"Score Board"}</RouterAnchor<AppRoute>>
                 </nav>
-                // <div class="w3-main" style="margin-left:390px;margin-right:40px">
-                // </div>
             </div>
         }
     }

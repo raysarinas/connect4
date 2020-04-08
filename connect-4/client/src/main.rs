@@ -9,7 +9,8 @@ use crate::routes::{
     tootottohuman::TootOttoHuman,
     gamehistory::GameHistory,
     scoreboard::ScoreBoard,
-    home::Home
+    home::Home,
+    fix_fragment_routes
 };
 
 mod nav_bar;
@@ -38,7 +39,7 @@ impl Component for Model {
         let router_agent = RouteAgent::bridge(link.callback(Msg::Route));
         let route_service: RouteService = RouteService::new();
         let mut route = route_service.get_route();
-
+        fix_fragment_routes(&mut route);
         Model {
             link,
             route: AppRoute::switch(route)
@@ -47,7 +48,10 @@ impl Component for Model {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::Route(route) => self.route = AppRoute::switch(route)
+            Msg::Route(mut route) => {
+                fix_fragment_routes(&mut route);
+                self.route = AppRoute::switch(route)
+            }
         }
         true
     }
@@ -57,6 +61,7 @@ impl Component for Model {
         html! {
             <div>
                 <NavigationBar />
+                <div class="w3-main" style="margin-left:390px;margin-right:40px">
                 {
                     if let Some(route) = &self.route {
                         match route {
@@ -74,6 +79,7 @@ impl Component for Model {
                         html!{"ERRRORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR"}
                     }
                 }
+                </div>
             </div>
         }
     }
