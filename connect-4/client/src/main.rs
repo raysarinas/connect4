@@ -7,6 +7,7 @@ use yew::prelude::*;
 pub struct Model {
     link: ComponentLink<Self>,
     tab: Tab,
+    difficulty: Difficulty,
     player1_name: String,
     player2_name: String
 }
@@ -23,7 +24,15 @@ pub enum Tab {
     Nothing
 }
 
+// could probably put this in a different file
+pub enum Difficulty {
+    Easy,
+    Medium,
+    Hard
+}
+
 // CONTROLLER
+// condense the following Clicked.... to ClickedTab(Tab) if can resolve recursion issue
 pub enum Msg {
     ClickedHowToC4,
     ClickedC4Comp,
@@ -35,6 +44,7 @@ pub enum Msg {
     ClickedScoreBoard,
     GotPlayer1Name(String),
     GotPlayer2Name(String),
+    GotDifficulty(Difficulty),
     StartConnect4,
     StartConnect4Comp,
     StartTootOtto,
@@ -49,6 +59,7 @@ impl Component for Model {
         Model {
             link,
             tab: Tab::Nothing,
+            difficulty: Difficulty::Easy,
             player1_name: "".into(),
             player2_name: "".into()
         }
@@ -66,6 +77,7 @@ impl Component for Model {
             Msg::ClickedScoreBoard => self.tab = Tab::ScoreBoard,
             Msg::GotPlayer1Name(name) => self.player1_name = name,
             Msg::GotPlayer2Name(name) => self.player2_name = name,
+            Msg::GotDifficulty(difficulty) => self.difficulty = difficulty,
             Msg::StartConnect4 => {
                 // i think we call callback emit here idk
             },
@@ -148,8 +160,17 @@ impl Model {
                         value=&self.player1_name
                         oninput=self.link.callback(|e: InputData| Msg::GotPlayer1Name(e.value))
                         placeholder="Your Name"/>
-                    <button onclick=self.link.callback(|_| Msg::StartConnect4)>{"Start Game"}</button>
                 </div>
+                <h1><b>{"Enter Difficulty"}</b></h1>
+                <div>
+                    <select>
+                        <option onclick=self.link.callback(|_| Msg::GotDifficulty(Difficulty::Easy))>{"Easy"}</option>
+                        <option onclick=self.link.callback(|_| Msg::GotDifficulty(Difficulty::Medium))>{"Medium"}</option>
+                        <option onclick=self.link.callback(|_| Msg::GotDifficulty(Difficulty::Hard))>{"Hard"}</option>
+                    </select>
+                </div>
+                <br></br>
+                <button onclick=self.link.callback(|_| Msg::StartConnect4)>{"Start Game"}</button>
             </div>
         }
     }
@@ -204,8 +225,17 @@ impl Model {
                         value=&self.player1_name
                         oninput=self.link.callback(|e: InputData| Msg::GotPlayer1Name(e.value))
                         placeholder="Your Name"/>
-                    <button onclick=self.link.callback(|_| Msg::StartTootOtto)>{"Start Game"}</button>
                 </div>
+                <h1><b>{"Enter Difficulty"}</b></h1>
+                <div>
+                    <select>
+                        <option onclick=self.link.callback(|_| Msg::GotDifficulty(Difficulty::Easy))>{"Easy"}</option>
+                        <option onclick=self.link.callback(|_| Msg::GotDifficulty(Difficulty::Medium))>{"Medium"}</option>
+                        <option onclick=self.link.callback(|_| Msg::GotDifficulty(Difficulty::Hard))>{"Hard"}</option>
+                    </select>
+                </div>
+                <br></br>
+                <button onclick=self.link.callback(|_| Msg::StartTootOtto)>{"Start Game"}</button>
             </div>
         }
     }
