@@ -18,8 +18,8 @@ pub enum Tab {
     HowToToot,
     TootOttoComputer,
     TootOttoHuman,
+    GameHistory,
     ScoreBoard,
-    Scores,
     Nothing
 }
 
@@ -31,8 +31,8 @@ pub enum Msg {
     ClickedHowToToot,
     ClickedTootComp,
     ClickedTootHuman,
+    ClickedGameHistory,
     ClickedScoreBoard,
-    ClickedScores,
     GotPlayer1Name(String),
     GotPlayer2Name(String),
     StartConnect4,
@@ -62,8 +62,8 @@ impl Component for Model {
             Msg::ClickedHowToToot => self.tab = Tab::HowToToot,
             Msg::ClickedTootComp => self.tab = Tab::TootOttoComputer,
             Msg::ClickedTootHuman => self.tab = Tab::TootOttoHuman,
+            Msg::ClickedGameHistory => self.tab = Tab::GameHistory,
             Msg::ClickedScoreBoard => self.tab = Tab::ScoreBoard,
-            Msg::ClickedScores => self.tab = Tab::Scores,
             Msg::GotPlayer1Name(name) => self.player1_name = name,
             Msg::GotPlayer2Name(name) => self.player2_name = name,
             Msg::StartConnect4 => {
@@ -91,8 +91,8 @@ impl Component for Model {
             Tab::HowToToot => self.view_howto_toototto(),
             Tab::TootOttoComputer => self.view_toototto_computer(),
             Tab::TootOttoHuman => self.view_toototto_human(),
+            Tab::GameHistory => self.view_game_history(),
             Tab::ScoreBoard => self.view_scoreboard(),
-            Tab::Scores => self.view_scores(),
             Tab::Nothing => self.view_main()
         };
         html! {
@@ -107,8 +107,8 @@ impl Component for Model {
                     <a href="#/HowToToot" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedHowToToot)>{"How to Play TOOT-OTTO"}</a><br></br>
                     <a href="#/TootOttoComputer" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedTootComp)>{"Play Toot-Otto with Computer"}</a><br></br>
                     <a href="#/TootOttoHuman" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedTootHuman)>{"Play Toot-Otto With Another Human"}</a><br></br>
-                    <a href="#/ScoreBoard" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedScoreBoard)>{"View Game History"}</a><br></br>
-                    <a href="#/Scores" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedScores)>{"Score Board"}</a>
+                    <a href="#/GameHistory" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedGameHistory)>{"View Game History"}</a><br></br>
+                    <a href="#/ScoreBoard" class="w3-padding w3-hover-white" onclick=self.link.callback(|_| Msg::ClickedScoreBoard)>{"Score Board"}</a>
                 </nav>
                 <div class="w3-main" style="margin-left:390px;margin-right:40px">
                     {view_tab()}
@@ -231,7 +231,7 @@ impl Model {
         }
     }
 
-    fn view_scoreboard(&self) -> Html {
+    fn view_game_history(&self) -> Html {
         html! {
             <div>
                 <h1><b>{"Game History"}</b></h1>
@@ -254,9 +254,54 @@ impl Model {
         }
     }
 
-    fn view_scores(&self) -> Html {
+    fn view_scoreboard(&self) -> Html {
         html! {
-            <p>{"Score Board"}</p>
+            <div>
+                <h1><b>{"Score Board"}</b></h1>
+                <div>
+                    <h4>{"Games Won by Computer"}</h4>
+                    <table border="1">
+                        <tr>
+                            <th>{"Total Games Played"}</th>
+                            <th>{"Games Against Computer"}</th>
+                            <th>{"Games Computer Won"}</th>
+                        </tr>
+                        <tr>
+                            // populate here i guess
+                        </tr>
+                    </table>
+                </div>
+                <br></br>
+                <div>
+                    <h4>{"Details of Games Won by Computer"}</h4>
+                    <table border="1">
+                        <tr>
+                            <th>{"Sl. No."}</th>
+                            <th>{"Game Type"}</th>
+                            <th>{"Winner"}</th>
+                            <th>{"Played Against"}</th>
+                            <th>{"When Played"}</th>
+                        </tr>
+                        <tr>
+                            // populate here i guess
+                        </tr>
+                    </table>
+                </div>
+                <br></br>
+                <div>
+                    <h4>{"Details of Games Won by All Players"}</h4>
+                    <table border="1">
+                        <tr>
+                            <th>{"Sl. No."}</th>
+                            <th>{"Winner or Draw"}</th>
+                            <th>{"No. of Wins"}</th>
+                        </tr>
+                        <tr>
+                            // populate here i guess
+                        </tr>
+                    </table>
+                </div>
+            </div>
         }
     }
 
