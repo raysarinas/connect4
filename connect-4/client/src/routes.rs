@@ -2,6 +2,8 @@
 
 pub mod howtoconnect4;
 pub mod connect4comp;
+pub mod connect4human;
+pub mod howtotoot;
 pub mod home;
 
 use yew_router::prelude::*;
@@ -13,6 +15,10 @@ pub enum AppRoute {
     HowToConnect4,
     #[to = "#/Connect4Computer"]
     Connect4Computer,
+    #[to = "#/Connect4Human"]
+    Connect4Human,
+    #[to = "#/HowToToot"]
+    HowToTootOtto,
     #[to = ""]
     Home
 }

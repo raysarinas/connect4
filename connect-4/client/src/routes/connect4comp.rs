@@ -3,13 +3,11 @@ use yew::prelude::*;
 pub struct Connect4Computer {
     link: ComponentLink<Self>,
     difficulty: Difficulty,
-    player1_name: String,
-    player2_name: String
+    player1_name: String
 }
 
 pub enum Msg {
     GotPlayer1Name(String),
-    GotPlayer2Name(String),
     GotDifficulty(Difficulty),
     StartGame
 }
@@ -28,15 +26,13 @@ impl Component for Connect4Computer {
         Connect4Computer {
             link,
             difficulty: Difficulty::Easy,
-            player1_name: "".into(),
-            player2_name: "".into()
+            player1_name: "".into()
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::GotPlayer1Name(name) => self.player1_name = name,
-            Msg::GotPlayer2Name(name) => self.player2_name = name,
             Msg::GotDifficulty(difficulty) => self.difficulty = difficulty,
             Msg::StartGame => {
 

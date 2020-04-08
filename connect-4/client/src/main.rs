@@ -3,6 +3,8 @@
 use crate::routes::{
     howtoconnect4::HowToConnect4,
     connect4comp::Connect4Computer,
+    connect4human::Connect4Human,
+    howtotoot::HowToTootOtto,
     home::Home
 };
 
@@ -56,6 +58,8 @@ impl Component for Model {
                         match route {
                             AppRoute::HowToConnect4 => html!{<HowToConnect4 />},
                             AppRoute::Connect4Computer => html!{<Connect4Computer />},
+                            AppRoute::Connect4Human => html!{<Connect4Human />},
+                            AppRoute::HowToTootOtto => html!{<HowToTootOtto />},
                             AppRoute::Home => html!{<Home />},
                         }
                     } else {
