@@ -10,7 +10,7 @@ impl Component for HowToConnect4 {
         HowToConnect4 {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, _: Self::Message) -> ShouldRender {
         true
     }
     

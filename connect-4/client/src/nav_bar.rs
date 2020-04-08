@@ -1,6 +1,6 @@
 use crate::routes::AppRoute;
 
-use yew::{html, Component, ComponentLink, Html, InputData, ShouldRender};
+use yew::{html, Component, ComponentLink, Html, ShouldRender};
 use yew_router::prelude::*;
 
 // MODEL
@@ -10,11 +10,11 @@ impl Component for NavigationBar {
     type Message = ();
     type Properties = ();
     
-    fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(_: Self::Properties, _: ComponentLink<Self>) -> Self {
         NavigationBar {}
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, _: Self::Message) -> ShouldRender {
         true
     }
     
