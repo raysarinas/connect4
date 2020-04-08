@@ -3,11 +3,11 @@ use yew::prelude::*;
 pub struct TootOttoComputer {
     link: ComponentLink<Self>,
     difficulty: Difficulty,
-    player1_name: String
+    player_name: String
 }
 
 pub enum Msg {
-    GotPlayer1Name(String),
+    GotPlayerName(String),
     GotDifficulty(Difficulty),
     StartGame
 }
@@ -26,13 +26,13 @@ impl Component for TootOttoComputer {
         TootOttoComputer {
             link,
             difficulty: Difficulty::Easy,
-            player1_name: "".into()
+            player_name: "".into()
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::GotPlayer1Name(name) => self.player1_name = name,
+            Msg::GotPlayerName(name) => self.player_name = name,
             Msg::GotDifficulty(difficulty) => self.difficulty = difficulty,
             Msg::StartGame => {
 
@@ -49,8 +49,8 @@ impl Component for TootOttoComputer {
                 <div>
                     <input
                         type="text"
-                        value=&self.player1_name
-                        oninput=self.link.callback(|e: InputData| Msg::GotPlayer1Name(e.value))
+                        value=&self.player_name
+                        oninput=self.link.callback(|e: InputData| Msg::GotPlayerName(e.value))
                         placeholder="Your Name"/>
                 </div>
                 <h1><b>{"Enter Difficulty"}</b></h1>

@@ -41,21 +41,21 @@ impl Component for Model {
             <div>
                 <NavigationBar />
                 <div class="w3-main" style="margin-left:390px;margin-right:40px">
-                <Router<AppRoute, ()>
-                    render = Router::render(|switch: AppRoute| {
-                        match switch {
-                            AppRoute::HowToConnect4 => html!{<HowToConnect4 />},
-                            AppRoute::Connect4Computer => html!{<Connect4Computer />},
-                            AppRoute::Connect4Human => html!{<Connect4Human />},
-                            AppRoute::HowToTootOtto => html!{<HowToTootOtto />},
-                            AppRoute::TootOttoComputer => html!{<TootOttoComputer />},
-                            AppRoute::TootOttoHuman => html!{<TootOttoHuman />},
-                            AppRoute::GameHistory => html!{<GameHistory />},
-                            AppRoute::ScoreBoard => html!{<ScoreBoard />},
-                            AppRoute::Home => html!{<Home />},
-                        }
-                    })
-                />
+                    <Router<AppRoute, ()>
+                        render = Router::render(|switch: AppRoute| {
+                            match switch {
+                                AppRoute::HowToConnect4 => html!{<HowToConnect4 />},
+                                AppRoute::Connect4Computer => html!{<Connect4Computer />},
+                                AppRoute::Connect4Human => html!{<Connect4Human />},
+                                AppRoute::HowToTootOtto => html!{<HowToTootOtto />},
+                                AppRoute::TootOttoComputer => html!{<TootOttoComputer />},
+                                AppRoute::TootOttoHuman => html!{<TootOttoHuman />},
+                                AppRoute::GameHistory => html!{<GameHistory />},
+                                AppRoute::ScoreBoard => html!{<ScoreBoard />},
+                                AppRoute::Home => html!{<Home />},
+                            }
+                        })
+                    />
                 </div>
             </div>
         }
