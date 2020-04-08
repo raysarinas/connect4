@@ -233,7 +233,24 @@ impl Model {
 
     fn view_scoreboard(&self) -> Html {
         html! {
-            <p>{"Game History"}</p>
+            <div>
+                <h1><b>{"Game History"}</b></h1>
+                <div>
+                    <table border="1">
+                        <tr>
+                            <th>{"Game-ID"}</th>
+                            <th>{"Game Type"}</th>
+                            <th>{"Player1"}</th>
+                            <th>{"Player2"}</th>
+                            <th>{"Winner"}</th>
+                            <th>{"When Played"}</th>
+                        </tr>
+                        <tr>
+                            // populate here i guess
+                        </tr>
+                    </table>
+                </div>
+            </div>
         }
     }
 
@@ -252,7 +269,7 @@ impl Model {
                     <li>{"Connect 4"}</li>
                     <li>{"TOOT-OTTO"}</li>
                 </ul>
-                <p>{"Select the game of your choice above, and start playing. Enjoy!"}</p>
+                <p>{"Select the game of your choice from the side bar, and start playing. Enjoy!"}</p>
             </div>
         }
     }
