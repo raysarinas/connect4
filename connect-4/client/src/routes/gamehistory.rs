@@ -1,10 +1,25 @@
-#![recursion_limit = "256"]
-
 use yew::prelude::*;
 use serde_json::json;
+use serde::{Serialize, Deserialize};
+use serde_json::ser;
 use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use anyhow::Error;
+use bson::UtcDateTime;
+use chrono::{DateTime, Utc};
+
+#[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Foo {
+    pub gameNumber: String,
+    pub gameType: String,
+    pub Player1Name: String,
+    pub Player2Name: String,
+    pub WinnerName: String,
+    // pub GameDate: <T>,//DateTime<Utc>,
+    #[serde(skip)] // FIX LATER UGHHH
+    pub GameDate: String,//&'a str,
+}
 
 pub struct GameHistory {
     link: ComponentLink<Self>,
@@ -15,12 +30,12 @@ pub struct GameHistory {
 pub struct State {
     link: ComponentLink<GameHistory>,
     fetching: bool, // for when the server says "one moment please"
-    json_value: Option<String>, // TODO: replace String with Game struct
+    json_value: Option<Vec<String>>, // TODO: replace String with Game struct
 }
 
 pub enum Msg {
     Fetch,
-    FetchComplete(Result<String, Error>), // TODO: replace string with Game and refactor
+    FetchComplete(Result<Vec<String>, Error>), // TODO: replace string with Game and refactor
     FetchFailed,
 }
 
@@ -64,14 +79,25 @@ impl Component for GameHistory {
     
     // VIEW
     fn view(&self) -> Html {
+        let row = |g: &Foo| {
+            html! {
+                <tr>
+                    <td>{"1"}</td>
+                    <td>{g.gameType.clone()}</td>
+                    <td>{g.Player1Name.clone()}</td>
+                    <td>{g.Player2Name.clone()}</td>
+                    <td>{g.WinnerName.clone()}</td>
+                    <td>{g.GameDate.clone()}</td>
+                </tr>
+            }
+        };
+
         html! {
             <div>
                 <h1><b>{"Game History"}</b></h1>
                 <div>
-                    <h4>{ self.view_history() }</h4>
-                </div>
-                <div>
                     <table border="1">
+                    <thead class="thead-dark">
                         <tr>
                             <th>{"Game-ID"}</th>
                             <th>{"Game Type"}</th>
@@ -80,9 +106,10 @@ impl Component for GameHistory {
                             <th>{"Winner"}</th>
                             <th>{"When Played"}</th>
                         </tr>
-                        <tr>
-                            // populate here i guess
-                        </tr>
+                    </thead>
+                        <tbody>
+                            { for self.get_gamevec().iter().map(row) }
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -91,19 +118,16 @@ impl Component for GameHistory {
 }
 
 impl GameHistory {
-    
-    fn view_history(&self) -> Html {
+    fn get_agame(val: &str) -> Foo {
+        let foo: Foo = serde_json::from_str(val).unwrap();
+        foo
+    }
+
+    fn get_gamevec(&self) -> Vec<Foo> {
         if let Some(value) = &self.state.json_value {
-            html! {
-                <>
-                // TODO: format game history i guess
-                { value }
-                </>
-            }
+            value.clone().iter_mut().map(|g| GameHistory::get_agame(g)).collect::<Vec<Foo>>()
         } else {
-            html! {
-                <p>{ "spare fetch?" }</p>
-            }
+            Vec::new() // TODO: handle error here
         }
     }
 }
@@ -114,7 +138,7 @@ impl State {
                 .body(Nothing).expect("Failed to build request");
         
         let callback = self.link.callback(
-            | response: Response<Json<Result<String, Error>>> | {
+            | response: Response<Json<Result<Vec<String>, Error>>> | {
                 let (meta, Json(body)) = response.into_parts();
                 if meta.status.is_success() {
                     return Msg::FetchComplete(body);
