@@ -1,0 +1,28 @@
+building client
+~/Git/connect4/connect-4/client ~/Git/connect4/connect-4
+~/Git/connect4/connect-4
+client build complete
+running server
+Configured for development.
+    => address: localhost
+    => port: 8000
+    => log: normal
+    => workers: 16
+    => secret key: private-cookies disabled
+    => limits: forms = 32KiB
+    => keep-alive: 5s
+    => tls: disabled
+    => [extra] databases: { mongoose = { url = "mongodb://localhost:27017/Connect4DB" } }
+Mounting /:
+    => GET / (index)
+    => GET /<file..> (files)
+    => GET /games (get_all_games)
+    => POST /games (create_game)
+    => GET /games/<id> (get_game)
+    => PUT /games/<id> (update_game)
+    => DELETE /games/<id> (delete_game)
+Rocket has launched from http://localhost:8000
+GET /games:
+    => Matched: GET /games (get_all_games)
+    => Outcome: Success
+    => Response succeeded.

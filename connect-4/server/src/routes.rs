@@ -30,7 +30,7 @@ pub struct Game {
 }
 
 #[get("/games")]
-pub fn get_all_games(conn: Mongoose) -> content::Json<String> {
+pub fn get_all_games(conn: Mongoose) -> Json<String> {
     let coll = conn.collection("games");
     let mut cursor = coll
                     .find(Some(doc! {}), None)
@@ -47,7 +47,7 @@ pub fn get_all_games(conn: Mongoose) -> content::Json<String> {
         }
     }
     
-    content::Json(format!("[{}]", contents.join(",")))
+    Json(format!("[{}]", contents.join(",")))
 }
 
 #[post("/games", data = "<game>")]
