@@ -12,11 +12,11 @@ use crate::routes::{
     home::Home
 };
 
+use crate::game_elements::nav_bar::NavigationBar;
+
 mod game_elements;
-mod nav_bar;
 mod routes;
 
-use nav_bar::*;
 use routes::*;
 
 use yew::prelude::*;
