@@ -15,19 +15,7 @@ use bson::UtcDateTime;
 use bson::oid::ObjectId;
 use bson::Bson;
 use chrono::prelude::*;
-
-// TODO: Move Game Struct so can be used by client/frontend
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Game {
-    #[serde(rename = "_id")]  // Use MongoDB's special primary key field name when serializing
-    pub id: Option<ObjectId>,
-    pub gameNumber: Option<String>,
-    pub gameType: Option<String>,
-    pub Player1Name: Option<String>,
-    pub Player2Name: Option<String>,
-    pub WinnerName: Option<String>,
-    pub GameDate: UtcDateTime,
-}
+use common::{Game};
 
 #[get("/games")]
 pub fn get_all_games(conn: Mongoose) -> Json<Vec<String>> {
@@ -47,19 +35,18 @@ pub fn get_all_games(conn: Mongoose) -> Json<Vec<String>> {
         }
     }
     Json(contents)
-    // Json(format!("[{}]", contents.join(",")))
 }
 
 #[post("/games", data = "<game>")]
 pub fn create_game(conn: Mongoose, game: Json<Game>) -> content::Json<String> {
     let inner = game.into_inner();
     let doc = doc! {
-        "gameNumber": inner.gameNumber.unwrap(),
-        "gameType": inner.gameType.unwrap(),
-        "Player1Name": inner.Player1Name.unwrap(),
-        "Player2Name": inner.Player2Name.unwrap(),
-        "WinnerName": inner.WinnerName.unwrap(),
-        "GameDate": Bson::UtcDatetime(inner.GameDate.0),
+        "gameNumber": inner.gameNumber,
+        "gameType": inner.gameType,
+        "Player1Name": inner.Player1Name,
+        "Player2Name": inner.Player2Name,
+        "WinnerName": inner.WinnerName,
+        "GameDate": Bson::UtcDatetime(Utc::now()),//Bson::UtcDatetime(inner.GameDate.0),
     };
     let test = doc.clone();
     let coll = conn.collection("games");
@@ -75,7 +62,7 @@ pub fn update_game(conn: Mongoose, id: String, game: Json<Game>) -> content::Jso
     let coll = conn.collection("games");
 
     let filter = doc!{ "_id": bson::oid::ObjectId::with_string(&id).unwrap()};
-    let update = doc!{"$set" => {"WinnerName" => inner.WinnerName.unwrap()}};
+    let update = doc!{"$set" => {"WinnerName" => inner.WinnerName}};
 
     coll.update_one(filter.clone(), update, None).unwrap();
 

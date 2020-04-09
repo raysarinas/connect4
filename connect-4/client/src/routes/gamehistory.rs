@@ -1,6 +1,5 @@
 use yew::prelude::*;
 use serde_json::json;
-use serde::{Serialize, Deserialize};
 use serde_json::ser;
 use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
@@ -8,18 +7,7 @@ use anyhow::Error;
 use bson::UtcDateTime;
 use chrono::{DateTime, Utc};
 
-#[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Foo {
-    pub gameNumber: String,
-    pub gameType: String,
-    pub Player1Name: String,
-    pub Player2Name: String,
-    pub WinnerName: String,
-    // pub GameDate: <T>,//DateTime<Utc>,
-    #[serde(skip)] // FIX LATER UGHHH
-    pub GameDate: String,//&'a str,
-}
+use common::{Game};
 
 pub struct GameHistory {
     link: ComponentLink<Self>,
@@ -79,10 +67,10 @@ impl Component for GameHistory {
     
     // VIEW
     fn view(&self) -> Html {
-        let row = |g: &Foo| {
+        let row = |g: &Game| {
             html! {
                 <tr>
-                    <td>{"1"}</td>
+                    <td>{"123"}</td>
                     <td>{g.gameType.clone()}</td>
                     <td>{g.Player1Name.clone()}</td>
                     <td>{g.Player2Name.clone()}</td>
@@ -118,14 +106,14 @@ impl Component for GameHistory {
 }
 
 impl GameHistory {
-    fn get_agame(val: &str) -> Foo {
-        let foo: Foo = serde_json::from_str(val).unwrap();
-        foo
+    fn get_agame(val: &str) -> Game {
+        let Game: Game = serde_json::from_str(val).unwrap();
+        Game
     }
 
-    fn get_gamevec(&self) -> Vec<Foo> {
+    fn get_gamevec(&self) -> Vec<Game> {
         if let Some(value) = &self.state.json_value {
-            value.clone().iter_mut().map(|g| GameHistory::get_agame(g)).collect::<Vec<Foo>>()
+            value.clone().iter_mut().map(|g| GameHistory::get_agame(g)).collect::<Vec<Game>>()
         } else {
             Vec::new() // TODO: handle error here
         }
