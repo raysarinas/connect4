@@ -19,7 +19,7 @@ impl Component for ConnectFourBoard {
     fn view(&self) -> Html {
         html!{
             <div>
-                <Board />
+                <Board rows=6 cols=7 />
             </div>
         }
     }

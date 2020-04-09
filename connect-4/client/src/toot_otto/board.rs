@@ -19,7 +19,7 @@ impl Component for TootOttoBoard {
     fn view(&self) -> Html {
         html!{
             <div>
-                <Board />
+                <Board rows=4 cols=6 />
             </div>
         }
     }
