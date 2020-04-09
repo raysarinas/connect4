@@ -6,7 +6,7 @@ use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use anyhow::Error;
 use bson::UtcDateTime;
 use chrono::{DateTime, Utc};
-
+use std::collections::HashMap;
 use common::{Game};
 
 pub struct ScoreBoard {
@@ -67,6 +67,28 @@ impl Component for ScoreBoard {
     
     // VIEW
     fn view(&self) -> Html {
+        let comprow = |g: &Game| {
+            html! {
+                <tr>
+                    <td>{"123"}</td>
+                    <td>{g.gameType.clone()}</td>
+                    <td>{g.WinnerName.clone()}</td>
+                    <td>{g.Player1Name.clone()}</td>
+                    // <td>{g.WinnerName.clone()}</td>
+                    <td>{g.GameDate.clone()}</td>
+                </tr>
+            }
+        };
+
+        // let statrow = |g: &Game| {
+        //     html! {
+        //         <tr>
+        //             <td>{"123"}</td>
+        //             <td>
+        //         </tr>
+        //     }
+        // };
+
         html! {
             <div>
                 <h1><b>{"Score Board"}</b></h1>
@@ -101,18 +123,9 @@ impl Component for ScoreBoard {
                             <th>{"Played Against"}</th>
                             <th>{"When Played"}</th>
                         </tr>
-                        <tr>
-                            // populate here i guess
-                        </tr>
                     </thead>
                         <tbody>
-                        <tr>
-                            <td>{ "HUH" }</td>
-                            <td>{ "Type" }</td>
-                            <td>{ "Winner" }</td>
-                            <td>{ "Against" }</td>
-                            <td>{ "When" }</td>
-                        </tr>
+                        { for self.get_games_computer().iter().map(comprow) }
                         </tbody>
                     </table>
                 </div>
@@ -120,11 +133,13 @@ impl Component for ScoreBoard {
                 <div>
                     <h4>{"Details of Games Won by All Players"}</h4>
                     <table border="1">
+                    // <thead class = "thead-dark">
                         <tr>
                             <th>{"Sl. No."}</th>
                             <th>{"Winner or Draw"}</th>
                             <th>{"No. of Wins"}</th>
                         </tr>
+                    // </thead>
                         <tr>
                             // populate here i guess
                         </tr>
@@ -165,6 +180,17 @@ impl ScoreBoard {
     fn get_num_games_total(&self) -> String {
         self.get_gamevec().len().to_string()
     }
+
+    // fn get_win_map(&self) -> HashMap<String, String> {
+    //     let mut wins = HashMap::new();
+        
+    //     for game in self.get_gamevec()
+    //             // .split(|c: char| !c.is_alphanumeric())
+    //         .filter(|player | !p.is_empty()) {
+    //             *wins.entry(game.to_owned()).or_insert(0) += 1;
+    //         }
+    //     wins
+    // }
 
 }
 
