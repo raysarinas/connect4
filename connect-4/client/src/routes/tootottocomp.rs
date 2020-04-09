@@ -4,13 +4,21 @@ pub struct TootOttoComputer {
     link: ComponentLink<Self>,
     difficulty: Difficulty,
     player_name: String,
+    toot_char: TootChar,
     info_submitted: bool
 }
 
 pub enum Msg {
     GotPlayerName(String),
+    GotTootChar(TootChar),
     GotDifficulty(String),
     StartGame
+}
+
+#[derive(PartialEq)]
+pub enum TootChar {
+    T,
+    O
 }
 
 pub enum Difficulty {
@@ -28,6 +36,7 @@ impl Component for TootOttoComputer {
             link,
             difficulty: Difficulty::Easy,
             player_name: "".into(),
+            toot_char: TootChar::T,
             info_submitted: false
         }
     }
@@ -35,6 +44,7 @@ impl Component for TootOttoComputer {
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::GotPlayerName(name) => self.player_name = name,
+            Msg::GotTootChar(toot_char) => self.toot_char = toot_char,
             Msg::GotDifficulty(difficulty) => {
                 match difficulty.as_ref() {
                     "Easy" => self.difficulty = Difficulty::Easy,
@@ -83,9 +93,21 @@ impl Component for TootOttoComputer {
                 </div>
                 <br></br>
                 <div hidden=!self.info_submitted>
-                    <h4>{"New Game: "}{&self.player_name}{" vs. Computer"}</h4>
-                    <small>{"(Winning Combination: "}{&self.player_name}{" - "}<b>{"TOOT"}</b>{" and Computer - "}<b>{"OTTO"}</b>{")"}</small>
-                    // add radio buttons here
+                    <div>
+                        <h4>{"New Game: "}{&self.player_name}{" vs. Computer"}</h4>
+                        <small>{"(Winning Combination: "}{&self.player_name}{" - "}<b>{"TOOT"}</b>{" and Computer - "}<b>{"OTTO"}</b>{")"}</small>
+                    </div>
+                    <br></br>
+                    <div>
+                        <form>
+                            <h4>{"Select a Disc Type   : "}
+                                <input name="tootchar" type="radio" id="T" checked={self.toot_char == TootChar::T} onclick=self.link.callback(|_| Msg::GotTootChar(TootChar::T))/>
+                                <label for="T">{" T "}</label>
+                                <input name="tootchar" type="radio" id="O" checked={self.toot_char == TootChar::O} onclick=self.link.callback(|_| Msg::GotTootChar(TootChar::O))/>
+                                <label for="O">{" O"}</label>
+                            </h4>
+                        </form>
+                    </div>
                     // draw board here i guess
                 </div>
             </div>
