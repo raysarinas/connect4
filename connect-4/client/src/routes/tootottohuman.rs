@@ -1,4 +1,4 @@
-use crate::game_elements::board::*;
+use crate::toot_otto::board::*;
 
 use yew::prelude::*;
 
@@ -45,7 +45,6 @@ impl Component for TootOttoHuman {
             Msg::StartGame => {
                 self.info_submitted = true;
                 // disable start game button here
-                // board stuff here? maybe not
             }
         }
         true
@@ -98,8 +97,7 @@ impl Component for TootOttoHuman {
                             </h4>
                         </form>
                     </div>
-                    // draw board here i guess
-                    <Board />
+                    <TootOttoBoard />
                 </div>
             </div>
         }

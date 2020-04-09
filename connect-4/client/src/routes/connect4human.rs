@@ -1,4 +1,4 @@
-use crate::game_elements::board::*;
+use crate::connect_four::board::*;
 
 use yew::prelude::*;
 
@@ -35,7 +35,6 @@ impl Component for Connect4Human {
             Msg::StartGame => {
                 self.info_submitted = true;
                 // disable start game button here
-                // board stuff here? maybe not
             }
         }
         true
@@ -65,8 +64,7 @@ impl Component for Connect4Human {
                 <div hidden=!self.info_submitted>
                     <h4>{"New Game: "}{&self.player1_name}{" vs. "}{&self.player2_name}</h4>
                     <small>{"(Disc Colors: "}{&self.player1_name}{" - "}<b>{"Red"}</b>{" and "}{&self.player2_name}{" - "}<b>{"Yellow"}</b>{")"}</small>
-                    // draw board here i guess
-                    <Board />
+                    <ConnectFourBoard />
                 </div>
             </div>
         }

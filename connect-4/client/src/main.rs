@@ -14,6 +14,8 @@ use crate::routes::{
 
 use crate::game_elements::nav_bar::NavigationBar;
 
+mod connect_four;
+mod toot_otto;
 mod game_elements;
 mod routes;
 
