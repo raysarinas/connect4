@@ -74,20 +74,20 @@ impl Component for ScoreBoard {
                     <td>{g.gameType.clone()}</td>
                     <td>{g.WinnerName.clone()}</td>
                     <td>{g.Player1Name.clone()}</td>
-                    // <td>{g.WinnerName.clone()}</td>
                     <td>{g.GameDate.clone()}</td>
                 </tr>
             }
         };
 
-        // let statrow = |g: &Game| {
-        //     html! {
-        //         <tr>
-        //             <td>{"123"}</td>
-        //             <td>
-        //         </tr>
-        //     }
-        // };
+        let winrow = |(winner, num)| {
+            html! {
+                <tr>
+                    <td>{"123"}</td>
+                    <td>{ winner }</td>
+                    <td>{ num }</td>
+                </tr>
+            }
+        };
 
         html! {
             <div>
@@ -133,16 +133,16 @@ impl Component for ScoreBoard {
                 <div>
                     <h4>{"Details of Games Won by All Players"}</h4>
                     <table border="1">
-                    // <thead class = "thead-dark">
+                    <thead class = "thead-dark">
                         <tr>
                             <th>{"Sl. No."}</th>
                             <th>{"Winner or Draw"}</th>
                             <th>{"No. of Wins"}</th>
                         </tr>
-                    // </thead>
-                        <tr>
-                            // populate here i guess
-                        </tr>
+                    </thead>
+                        <tbody>
+                            { for self.get_win_map().iter().map(winrow) }
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -181,16 +181,15 @@ impl ScoreBoard {
         self.get_gamevec().len().to_string()
     }
 
-    // fn get_win_map(&self) -> HashMap<String, String> {
-    //     let mut wins = HashMap::new();
-        
-    //     for game in self.get_gamevec()
-    //             // .split(|c: char| !c.is_alphanumeric())
-    //         .filter(|player | !p.is_empty()) {
-    //             *wins.entry(game.to_owned()).or_insert(0) += 1;
-    //         }
-    //     wins
-    // }
+    fn get_win_map(&self) -> HashMap<String, usize> {
+        self.get_gamevec().iter()
+            .fold(HashMap::new(), |mut acc, doc| {
+                acc.entry(doc.WinnerName.clone())
+                    .and_modify(|e| { *e += 1 })
+                    .or_insert_with(|| 1);
+            acc
+        })
+    }
 
 }
 
