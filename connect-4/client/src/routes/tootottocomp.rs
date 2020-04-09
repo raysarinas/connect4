@@ -101,9 +101,19 @@ impl Component for TootOttoComputer {
                     <div>
                         <form>
                             <h4>{"Select a Disc Type   : "}
-                                <input name="tootchar" type="radio" id="T" checked={self.toot_char == TootChar::T} onclick=self.link.callback(|_| Msg::GotTootChar(TootChar::T))/>
+                                <input
+                                    name="tootchar"
+                                    type="radio"
+                                    id="T"
+                                    checked={self.toot_char == TootChar::T}
+                                    onclick=self.link.callback(|_| Msg::GotTootChar(TootChar::T))/>
                                 <label for="T">{" T "}</label>
-                                <input name="tootchar" type="radio" id="O" checked={self.toot_char == TootChar::O} onclick=self.link.callback(|_| Msg::GotTootChar(TootChar::O))/>
+                                <input
+                                    name="tootchar"
+                                    type="radio"
+                                    id="O"
+                                    checked={self.toot_char == TootChar::O}
+                                    onclick=self.link.callback(|_| Msg::GotTootChar(TootChar::O))/>
                                 <label for="O">{" O"}</label>
                             </h4>
                         </form>
