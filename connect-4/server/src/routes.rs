@@ -13,6 +13,8 @@ use serde::{Serialize, Deserialize};
 use serde_json::ser;
 use bson::UtcDateTime;
 use bson::oid::ObjectId;
+use bson::Bson;
+use chrono::prelude::*;
 
 // TODO: Move Game Struct so can be used by client/frontend
 #[derive(Serialize, Deserialize, Debug)]
@@ -24,7 +26,7 @@ pub struct Game {
     pub Player1Name: Option<String>,
     pub Player2Name: Option<String>,
     pub WinnerName: Option<String>,
-    pub GameDate: Option<String>,
+    pub GameDate: UtcDateTime,
 }
 
 #[get("/games")]
@@ -57,7 +59,7 @@ pub fn create_game(conn: Mongoose, game: Json<Game>) -> content::Json<String> {
         "Player1Name": inner.Player1Name.unwrap(),
         "Player2Name": inner.Player2Name.unwrap(),
         "WinnerName": inner.WinnerName.unwrap(),
-        "GameDate": inner.GameDate.unwrap(),
+        "GameDate": Bson::UtcDatetime(inner.GameDate.0),
     };
     let test = doc.clone();
     let coll = conn.collection("games");
