@@ -1,3 +1,5 @@
+use crate::game_elements::board::*;
+
 use yew::prelude::*;
 
 pub struct TootOttoHuman {
@@ -97,6 +99,7 @@ impl Component for TootOttoHuman {
                         </form>
                     </div>
                     // draw board here i guess
+                    <Board />
                 </div>
             </div>
         }

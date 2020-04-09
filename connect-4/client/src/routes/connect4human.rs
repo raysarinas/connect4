@@ -1,3 +1,5 @@
+use crate::game_elements::board::*;
+
 use yew::prelude::*;
 
 pub struct Connect4Human {
@@ -64,6 +66,7 @@ impl Component for Connect4Human {
                     <h4>{"New Game: "}{&self.player1_name}{" vs. "}{&self.player2_name}</h4>
                     <small>{"(Disc Colors: "}{&self.player1_name}{" - "}<b>{"Red"}</b>{" and "}{&self.player2_name}{" - "}<b>{"Yellow"}</b>{")"}</small>
                     // draw board here i guess
+                    <Board />
                 </div>
             </div>
         }

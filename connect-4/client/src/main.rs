@@ -12,6 +12,7 @@ use crate::routes::{
     home::Home
 };
 
+mod game_elements;
 mod nav_bar;
 mod routes;
 
