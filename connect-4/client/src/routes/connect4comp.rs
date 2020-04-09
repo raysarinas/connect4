@@ -9,7 +9,7 @@ pub struct Connect4Computer {
 
 pub enum Msg {
     GotPlayerName(String),
-    GotDifficulty(Difficulty),
+    GotDifficulty(String),
     StartGame
 }
 
@@ -35,7 +35,14 @@ impl Component for Connect4Computer {
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::GotPlayerName(name) => self.player_name = name,
-            Msg::GotDifficulty(difficulty) => self.difficulty = difficulty,
+            Msg::GotDifficulty(difficulty) => {
+                match difficulty.as_ref() {
+                    "Easy" => self.difficulty = Difficulty::Easy,
+                    "Medium" => self.difficulty = Difficulty::Medium,
+                    "Hard" => self.difficulty = Difficulty::Hard,
+                    _ => unreachable!()
+                }
+            }
             Msg::StartGame => {
                 self.info_submitted = true;
                 // disable start game button here
@@ -60,10 +67,15 @@ impl Component for Connect4Computer {
                     </div>
                     <h1><b>{"Enter Difficulty"}</b></h1>
                     <div>
-                        <select>
-                            <option onclick=self.link.callback(|_| Msg::GotDifficulty(Difficulty::Easy))>{"Easy"}</option>
-                            <option onclick=self.link.callback(|_| Msg::GotDifficulty(Difficulty::Medium))>{"Medium"}</option>
-                            <option onclick=self.link.callback(|_| Msg::GotDifficulty(Difficulty::Hard))>{"Hard"}</option>
+                        <select onchange=self.link.callback(|e: ChangeData| {
+                            match e {
+                                ChangeData::Select(s) => Msg::GotDifficulty(s.value().unwrap()),
+                                _ => unreachable!()
+                            }
+                        })>
+                            <option value="Easy">{"Easy"}</option>
+                            <option value="Medium">{"Medium"}</option>
+                            <option value="Hard">{"Hard"}</option>
                         </select>
                     </div>
                     <br></br>
