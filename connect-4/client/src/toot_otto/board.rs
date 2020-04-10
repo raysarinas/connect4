@@ -10,7 +10,9 @@ pub struct TootOttoBoard {
     board: HashMap<Coord, Token>,
     turn_map: HashMap<Coord, Turn>,
     selected_token: Token,
-    turn: Turn
+    turn: Turn,
+    game_over: bool,
+    winner: String
 }
 
 #[derive(Clone, PartialEq, Hash, Eq, Copy)]
@@ -21,7 +23,7 @@ pub enum Token {
 
 pub enum Msg {
     GotToken(Token),
-    Clicked(isize, isize)
+    Clicked(Dim, Dim)
 }
 
 #[derive(PartialEq, Properties, Clone)]
@@ -42,7 +44,9 @@ impl Component for TootOttoBoard {
             board: HashMap::new(),
             turn_map: HashMap::new(),
             selected_token: Token::T,
-            turn: Turn::First
+            turn: Turn::First,
+            game_over: false,
+            winner: "".into()
         }
     }
 
@@ -58,9 +62,13 @@ impl Component for TootOttoBoard {
         match msg {
             Msg::GotToken(token) => self.selected_token = token,
             Msg::Clicked(row, col) => {
-                match self.drop(col, self.selected_token, self.turn) {
-                    Ok(()) => self.turn.next(),
-                    Err(e) => println!("Err: {}", e), // TODO: do something with this
+                if !self.game_over {
+                    match self.drop(col, self.selected_token, self.turn) {
+                        Ok(()) => self.turn.next(),
+                        Err(e) => println!("Err: {}", e), // TODO: do something with this
+                    }
+
+                    // if self.player2_name == "Computer", make ai move here i guess
                 }
             }
         }
@@ -137,6 +145,9 @@ impl Component for TootOttoBoard {
                     </form>
                     <h4>{"Turn   : "}{turn()}</h4>
                 </div>
+                <div hidden=!self.game_over>
+                    <h1><b>{&self.winner}{" wins"}</b></h1>
+                </div>
                 <table class="board">
                     {row(3)}
                     {row(2)}
@@ -198,37 +209,48 @@ impl TootOttoBoard {
         None
     }
 
-    // TODO: actually keep track of game_result and game_over
+    // check if the board is full by checking if there is a token 
+    // at every col of the top row
+    fn is_full(&self) -> bool {
+        let top_row = 3;
+
+        for col in 0..6 {
+            if self.get_token_at((top_row, col)).is_none() {
+                return false;
+            }
+        };
+        
+        true
+    }
+
     fn check(&mut self) {
         let winners = self.find_winners();
 
         match winners.len() {
             2 => {
-                // self.game_result = Some(GameResult::Tie);
-                // self.game_over = true;
+                self.game_over = true;
                 return;
             }
             1 => {
-                let winner = if winners.contains(&Token::T) {
-                    Token::T
+                let winner = if winners.contains(&Turn::First) {
+                    &self.props.player1_name
                 } else {
-                    Token::O
+                    &self.props.player2_name
                 };
 
-                // self.game_result = Some(GameResult::Winner(winner));
-                // self.game_over = true;
+                self.winner = winner.to_string();
+                self.game_over = true;
                 return;
             }
             _ => {}
         };
 
-        // if self.is_full() {
-            // self.game_result = Some(GameResult::Tie);
-            // self.game_over = true;
-        // }
+        if self.is_full() {
+            self.game_over = true;
+        }
     }
 
-    fn find_winners(&self) -> HashSet<&Token> {
+    fn find_winners(&self) -> HashSet<&Turn> {
         let rows = 4;
         let cols = 6;
         let mut winners_set = HashSet::new();
@@ -253,7 +275,7 @@ impl TootOttoBoard {
                     && self.token_is_at((row, col + 2), opposite)
                     && self.token_is_at((row, col + 3), token)
                 {
-                    winners_set.insert(token);
+                    winners_set.insert(&self.turn);
                     continue;
                 }
 
@@ -263,7 +285,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col), opposite)
                         && self.token_is_at((row + 3, col), token)
                     {
-                        winners_set.insert(token);
+                        winners_set.insert(&self.turn);
                         continue;
                     }
 
@@ -273,7 +295,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col + 2), opposite)
                         && self.token_is_at((row + 3, col + 3), token)
                     {
-                        winners_set.insert(token);
+                        winners_set.insert(&self.turn);
                         continue;
                     }
 
@@ -283,7 +305,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col - 2), opposite)
                         && self.token_is_at((row + 3, col - 3), token)
                     {
-                        winners_set.insert(token);
+                        winners_set.insert(&self.turn);
                         continue;
                     }
                 }
