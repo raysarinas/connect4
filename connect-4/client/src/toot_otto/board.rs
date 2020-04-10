@@ -4,7 +4,7 @@ use yew::prelude::*;
 
 pub struct TootOttoBoard {
     link: ComponentLink<Self>,
-    token: Token,
+    selected_token: Token,
     player1: Player,
     player2: Player,
     difficulty: Difficulty
@@ -17,13 +17,13 @@ pub enum Token {
 }
 
 pub struct Player {
-    player_name: String,
+    name: String,
     token: Token
 }
 
 pub enum Msg {
     GotToken(Token),
-    ClickedToken(usize, usize)
+    Clicked(usize, usize)
 }
 
 #[derive(Properties, Clone)]
@@ -39,18 +39,18 @@ impl Component for TootOttoBoard {
 
     fn create(p: Self::Properties, link: ComponentLink<Self>) -> Self {
         let player1 = Player {
-            player_name: p.player1_name,
+            name: p.player1_name,
             token: Token::T
         };
 
         let player2 = Player {
-            player_name: p.player2_name,
+            name: p.player2_name,
             token: Token::O
         };
 
         TootOttoBoard {
             link,
-            token: Token::T,
+            selected_token: Token::T,
             player1: player1,
             player2: player2,
             difficulty: p.difficulty
@@ -59,8 +59,8 @@ impl Component for TootOttoBoard {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::GotToken(token) => self.token = token,
-            Msg::ClickedToken(row, col) => {}
+            Msg::GotToken(token) => {self.selected_token = token}, // TODO: assign selected_token to whoever's turn it is
+            Msg::Clicked(row, col) => {}
         }
         true
     }
@@ -68,7 +68,7 @@ impl Component for TootOttoBoard {
     fn view(&self) -> Html {
         let col = |r, c| {
             html! {
-                <td class="board_column" onclick=self.link.callback(move |_| Msg::ClickedToken(r, c))>{""}</td>
+                <td class="board_column" onclick=self.link.callback(move |_| Msg::Clicked(r, c))>{""}</td>
             }
         };
 
@@ -94,14 +94,14 @@ impl Component for TootOttoBoard {
                                 name="token"
                                 type="radio"
                                 id="T"
-                                checked={self.token == Token::T}
+                                checked={self.selected_token == Token::T}
                                 onclick=self.link.callback(|_| Msg::GotToken(Token::T))/>
                             <label for="T">{" T "}</label>
                             <input
                                 name="token"
                                 type="radio"
                                 id="O"
-                                checked={self.token == Token::O}
+                                checked={self.selected_token == Token::O}
                                 onclick=self.link.callback(|_| Msg::GotToken(Token::O))/>
                             <label for="O">{" O"}</label>
                         </h4>
