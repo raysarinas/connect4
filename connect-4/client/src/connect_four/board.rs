@@ -3,6 +3,14 @@ use crate::game_elements::*;
 use std::collections::{HashSet, HashMap};
 
 use yew::prelude::*;
+use serde_json::json;
+use serde_json::ser;
+use yew::format::{Json, Nothing};
+use yew::services::fetch::{FetchService, FetchTask, Request, Response};
+use anyhow::Error;
+use bson::UtcDateTime;
+use chrono::{DateTime, Utc};
+use common::Game;
 
 pub struct ConnectFourBoard {
     link: ComponentLink<Self>,
@@ -12,7 +20,15 @@ pub struct ConnectFourBoard {
     current_token: Token,
     turn: Turn,
     game_over: bool,
-    winner: String
+    winner: String,
+    ft: Option<FetchTask>,
+    state: State,
+}
+
+pub struct State {
+    link: ComponentLink<ConnectFourBoard>,
+    fetching: bool,
+    json_value: Option<Game>,
 }
 
 #[derive(Clone, PartialEq, Hash, Eq, Copy)]
@@ -22,7 +38,10 @@ pub enum Token {
 }
 
 pub enum Msg {
-    Clicked(Dim, Dim)
+    Clicked(Dim, Dim),
+    Fetch,
+    FetchComplete(Result<String, Error>),
+    FetchFailed,
 }
 
 #[derive(PartialEq, Properties, Clone)]
@@ -37,6 +56,12 @@ impl Component for ConnectFourBoard {
     type Properties = Props;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let mut state = State {
+            link: link.clone(),
+            fetching: true,
+            json_value: None,
+        };
+
         ConnectFourBoard {
             link,
             props: props,
@@ -45,7 +70,9 @@ impl Component for ConnectFourBoard {
             current_token: Token::Y,
             turn: Turn::First,
             game_over: false,
-            winner: "".into()
+            winner: "".into(),
+            ft: None, //Some(task),
+            state,
         }
     }
 
@@ -73,6 +100,18 @@ impl Component for ConnectFourBoard {
 
                     // if self.props.player2_name == "Computer", make ai move here i guess
                 }
+            },
+            Msg::Fetch => {
+                let task = self.state.post_game(&self.props, &self.winner);
+                self.ft = Some(task);
+            },
+            Msg::FetchComplete(body) => {
+                self.state.fetching = false;
+                // self.state.json_value = body.map(|data| data).ok();
+            },
+            Msg::FetchFailed => {
+                self.state.json_value = None;
+                return false;
             }
         };
         true
@@ -228,11 +267,17 @@ impl ConnectFourBoard {
 
             self.winner = winner.to_string();
             self.game_over = true;
+            self.post_game();
         }
 
         if self.is_full() {
             self.game_over = true;
+            // TODO: handle tie here?
         }
+    }
+
+    fn post_game(&mut self) {
+        self.state.post_game(&self.props, &self.winner);
     }
 
     pub fn find_winner(&self) -> Option<Token> {
@@ -289,5 +334,41 @@ impl ConnectFourBoard {
         }
 
         None
+    }
+}
+
+
+impl State {
+    fn post_game(&mut self, props: &Props, winner: &String) -> FetchTask {
+        let mut winner_str = || if winner.is_empty() {
+            "Tie".to_string()
+        } else {
+            winner.clone()
+        };
+
+        let new_game = Game {
+            gameNumber: "1".to_string(),
+            gameType: "Connect-4".to_string(),
+            Player1Name: props.player1_name.clone(),
+            Player2Name: props.player2_name.clone(),
+            WinnerName: winner_str(),
+            GameDate: "".to_string(),
+        };
+
+        let post_request = Request::post("/games")
+            .body(Json(&new_game))
+            .expect("Failed to build request");
+
+        let callback = self.link.callback(
+            | response: Response<Result<String, Error>>| {
+                if response.status().is_success() {
+                    Msg::Fetch
+                }
+                else {
+                    Msg::FetchFailed
+                }
+            },
+        );
+        FetchService::new().fetch(post_request, callback).unwrap()
     }
 }
