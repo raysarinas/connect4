@@ -2,3 +2,8 @@
 connect-4/server/Cargo.lock
 *.lock
 connect-4/server/static/client.wasm
+connect-4/server/Cargo.lock
+connect-4/server/static/client.js
+connect-4/server/static/client.wasm
+connect-4/server/static/index.html
+connect-4/client/Cargo.lock

@@ -10,6 +10,22 @@ pub struct Props {
     pub cols: usize     // do self.props.cols to access
 }
 
+impl Board {
+    fn view_board(&self) -> Html {
+        let board_style = "border:1px solid #00B7FF; background-color: #00B7FF";
+
+        html! {
+            <div style="">
+            // <script src=js></script>
+                <canvas id="gameboard"
+                    style=board_style
+                    width="640"
+                    height="480"></canvas>
+            </div>
+        }
+    }
+}
+
 impl Component for Board {
     type Message = ();
     type Properties = Props;
@@ -26,62 +42,66 @@ impl Component for Board {
 
     fn view(&self) -> Html {
         html!{
-            <table border="1">
-                <tr>
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                </tr>
-                <tr>
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                </tr>
-                <tr>
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                </tr>
-                <tr>
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                </tr>
-                <tr>
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                </tr>
-                <tr>
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td />
-                    <td /> 
-                </tr>
-            </table>
+            
+            // <table border="1">
+            <h3>
+            {self.view_board()}
+            </h3>
+            //     <tr>
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //     </tr>
+            //     <tr>
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //     </tr>
+            //     <tr>
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //     </tr>
+            //     <tr>
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //     </tr>
+            //     <tr>
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //     </tr>
+            //     <tr>
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td />
+            //         <td /> 
+            //     </tr>
+            // </table>
         }
     }
 }
