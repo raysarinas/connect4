@@ -51,7 +51,6 @@ a {
 .board {
 	background: #00bfff;
 	border: 5px solid #00bfff;
-	width: 440px;
 }
 
 .board_column {
@@ -59,6 +58,8 @@ a {
 	width: 60px;
 	background: #fff;
 	border: 5px solid #00bfff;
+	border-radius: 50%;
+	text-align: center;
 }
 
 .board_column:hover {
