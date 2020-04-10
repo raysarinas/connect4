@@ -160,6 +160,12 @@ impl Component for TootOttoBoard {
             Turn::Second => &self.props.player2_name
         };
 
+        let get_result = || if self.winner.is_empty() {
+            html! { <h1><b>{"It's a draw"}</b></h1> }
+        } else {
+            html! { <h1><b>{&self.winner}{" wins"}</b></h1> }
+        };
+
         html! {
             <div>
                 <div>
@@ -184,7 +190,8 @@ impl Component for TootOttoBoard {
                     <h4>{"Turn   : "}{turn()}</h4>
                 </div>
                 <div hidden=!self.game_over>
-                    <h1><b>{"Winner: "}{format!("{}", &self.winner)}</b></h1>
+                    {get_result()}
+                    // <h1><b>{"Winner: "}{format!("{}", &self.winner)}</b></h1>
                 </div>
                 <table class="board">
                     {row(3)}
@@ -271,7 +278,7 @@ impl TootOttoBoard {
                 return;
             }
             1 => {
-                let winner = if winners.contains(&Turn::First) {
+                let winner = if winners.contains(&Token::T) {
                     &self.props.player1_name
                 } else {
                     &self.props.player2_name
@@ -286,7 +293,7 @@ impl TootOttoBoard {
         };
 
         if self.is_full() {
-            self.winner = "Tie".to_string();
+            // self.winner = "Tie".to_string();
             self.game_over = true;
             self.post_game();
         }
@@ -296,7 +303,7 @@ impl TootOttoBoard {
         self.state.post_game(&self.props, &self.winner);
     }
 
-    fn find_winners(&self) -> HashSet<&Turn> {
+    fn find_winners(&self) -> HashSet<&Token> {
         let rows = 4;
         let cols = 6;
         let mut winners_set = HashSet::new();
@@ -321,7 +328,7 @@ impl TootOttoBoard {
                     && self.token_is_at((row, col + 2), opposite)
                     && self.token_is_at((row, col + 3), token)
                 {
-                    winners_set.insert(&self.turn);
+                    winners_set.insert(token);
                     continue;
                 }
 
@@ -331,7 +338,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col), opposite)
                         && self.token_is_at((row + 3, col), token)
                     {
-                        winners_set.insert(&self.turn);
+                        winners_set.insert(token);
                         continue;
                     }
 
@@ -341,7 +348,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col + 2), opposite)
                         && self.token_is_at((row + 3, col + 3), token)
                     {
-                        winners_set.insert(&self.turn);
+                        winners_set.insert(token);
                         continue;
                     }
 
@@ -351,7 +358,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col - 2), opposite)
                         && self.token_is_at((row + 3, col - 3), token)
                     {
-                        winners_set.insert(&self.turn);
+                        winners_set.insert(token);
                         continue;
                     }
                 }
@@ -364,12 +371,18 @@ impl TootOttoBoard {
 
 impl State {
     fn post_game(&mut self, props: &Props, winner: &String) -> FetchTask {
+        let mut winner_str = || if winner.is_empty() {
+            "Tie".to_string()
+        } else {
+            winner.clone()
+        };
+
         let new_game = Game {
             gameNumber: "1".to_string(),
             gameType: "TOOT-OTTO".to_string(),
             Player1Name: props.player1_name.clone(),
             Player2Name: props.player2_name.clone(),
-            WinnerName: winner.to_string(),
+            WinnerName: winner_str(),
             GameDate: "".to_string(),
         };
 
