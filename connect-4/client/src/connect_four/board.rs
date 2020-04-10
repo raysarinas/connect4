@@ -16,7 +16,6 @@ pub struct ConnectFourBoard {
     link: ComponentLink<Self>,
     props: Props,
     board: HashMap<Coord, Token>,
-    turn_map: HashMap<Coord, Turn>,
     current_token: Token,
     turn: Turn,
     game_over: bool,
@@ -66,8 +65,7 @@ impl Component for ConnectFourBoard {
             link,
             props: props,
             board: HashMap::new(),
-            turn_map: HashMap::new(),
-            current_token: Token::Y,
+            current_token: Token::R,
             turn: Turn::First,
             game_over: false,
             winner: "".into(),
@@ -88,13 +86,14 @@ impl Component for ConnectFourBoard {
         match msg {
             Msg::Clicked(row, col) => {
                 if !self.game_over {
-                    self.current_token = match self.current_token {
-                        Token::R => Token::Y,
-                        Token::Y => Token::R,
-                    };
-
-                    match self.drop(col, self.current_token, self.turn) {
-                        Ok(()) => self.turn.next(),
+                    match self.drop(col, self.current_token) {
+                        Ok(()) => {
+                            self.current_token = match self.current_token {
+                                Token::R => Token::Y,
+                                Token::Y => Token::R,
+                            };
+                            self.turn.next();
+                        },
                         Err(e) => println!("Err: {}", e), // TODO: do something with this
                     }
 
@@ -118,21 +117,21 @@ impl Component for ConnectFourBoard {
     }
 
     fn view(&self) -> Html {
-        let draw_token = |r, c| match self.get_turn_at((r,c)) {
-            Some(turn) => {
-                match &turn {
-                    Turn::First => "R",
-                    Turn::Second => "Y"
+        let draw_token = |r, c| match self.get_token_at((r,c)) {
+            Some(token) => {
+                match &token {
+                    Token::R => "R",
+                    Token::Y => "Y"
                 }
             },
             None => ""
         };
 
-        let get_cell_color = |r, c| match self.get_turn_at((r,c)) {
-            Some(turn) => {
-                match &turn {
-                    Turn::First => "red",
-                    Turn::Second => "bright_yellow"
+        let get_cell_color = |r, c| match self.get_token_at((r,c)) {
+            Some(token) => {
+                match &token {
+                    Token::R => "red",
+                    Token::Y => "bright_yellow"
                 }
             },
             None => ""
@@ -194,10 +193,10 @@ impl Component for ConnectFourBoard {
 
 impl ConnectFourBoard {
     // Bottom left is 0, 0
-    fn drop(&mut self, col: Dim, token: Token, turn: Turn) -> Result<(), &'static str> {
+    fn drop(&mut self, col: Dim, token: Token) -> Result<(), &'static str> {
         match self.next_free_row(col) {
             Some(row) => {
-                self.put_token_at((row, col), token, turn);
+                self.put_token_at((row, col), token);
                 self.check();
                 Ok(())
             }
@@ -215,19 +214,13 @@ impl ConnectFourBoard {
 
     // set the token at a given location on the board
     // assert that there were no tokens there before
-    fn put_token_at(&mut self, coord: Coord, token: Token, turn: Turn) {
+    fn put_token_at(&mut self, coord: Coord, token: Token) {
         self.board.insert(coord, token);
-        self.turn_map.insert(coord, turn);
     }
 
     // Get the token at a given location on the board
     fn get_token_at(&self, coord: Coord) -> Option<&Token> {
         self.board.get(&coord)
-    }
-
-    // Get the turn at a given location on the board
-    fn get_turn_at(&self, coord: Coord) -> Option<&Turn> {
-        self.turn_map.get(&coord)
     }
 
     // Given a col, check the next free row
