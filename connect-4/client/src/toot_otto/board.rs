@@ -1,13 +1,12 @@
-use crate::game_elements::Difficulty;
+use crate::game_elements::*;
 
 use yew::prelude::*;
 
 pub struct TootOttoBoard {
     link: ComponentLink<Self>,
+    props: Props,
     selected_token: Token,
-    player1: Player,
-    player2: Player,
-    difficulty: Difficulty
+    turn: Turn
 }
 
 #[derive(PartialEq)]
@@ -16,17 +15,12 @@ pub enum Token {
     O
 }
 
-pub struct Player {
-    name: String,
-    token: Token
-}
-
 pub enum Msg {
     GotToken(Token),
     Clicked(usize, usize)
 }
 
-#[derive(Properties, Clone)]
+#[derive(PartialEq, Properties, Clone)]
 pub struct Props {
     pub player1_name: String,
     pub player2_name: String,
@@ -37,30 +31,31 @@ impl Component for TootOttoBoard {
     type Message = Msg;
     type Properties = Props;
 
-    fn create(p: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let player1 = Player {
-            name: p.player1_name,
-            token: Token::T
-        };
-
-        let player2 = Player {
-            name: p.player2_name,
-            token: Token::O
-        };
-
+    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         TootOttoBoard {
             link,
+            props: props,
             selected_token: Token::T,
-            player1: player1,
-            player2: player2,
-            difficulty: p.difficulty
+            turn: Turn::First
         }
+    }
+
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
+        let changed = self.props != props;
+        if changed {
+            self.props = props;
+        }
+        changed
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::GotToken(token) => {self.selected_token = token}, // TODO: assign selected_token to whoever's turn it is
-            Msg::Clicked(row, col) => {}
+            Msg::GotToken(token) => self.selected_token = token,
+            Msg::Clicked(row, col) => {
+                // draw token here
+
+                self.turn.next();
+            }
         }
         true
     }
@@ -85,6 +80,11 @@ impl Component for TootOttoBoard {
             }
         };
 
+        let turn = || match self.turn {
+            Turn::First => &self.props.player1_name,
+            Turn::Second => &self.props.player2_name
+        };
+
         html! {
             <div>
                 <div>
@@ -106,6 +106,7 @@ impl Component for TootOttoBoard {
                             <label for="O">{" O"}</label>
                         </h4>
                     </form>
+                    <h4>{"Turn   : "}{turn()}</h4>
                 </div>
                 <table class="board">
                     {row(0)}
@@ -116,5 +117,11 @@ impl Component for TootOttoBoard {
                 <br></br>
             </div>
         }
+    }
+}
+
+impl TootOttoBoard {
+    fn find_winner() {
+
     }
 }
