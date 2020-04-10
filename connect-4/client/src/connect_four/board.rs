@@ -118,11 +118,11 @@ impl Component for ConnectFourBoard {
     }
 
     fn view(&self) -> Html {
-        let draw_token = |r, c| match self.get_token_at((r,c)) {
-            Some(token) => {
-                match &token {
-                    Token::R => "R",
-                    Token::Y => "Y"
+        let draw_token = |r, c| match self.get_turn_at((r,c)) {
+            Some(turn) => {
+                match &turn {
+                    Turn::First => "R",
+                    Turn::Second => "Y"
                 }
             },
             None => ""
