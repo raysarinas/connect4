@@ -1,4 +1,5 @@
 use crate::toot_otto::board::*;
+use crate::game_elements::Difficulty;
 
 use yew::prelude::*;
 
@@ -13,12 +14,6 @@ pub enum Msg {
     GotPlayerName(String),
     GotDifficulty(String),
     StartGame
-}
-
-pub enum Difficulty {
-    Easy,
-    Medium,
-    Hard
 }
 
 impl Component for TootOttoComputer {
@@ -89,7 +84,7 @@ impl Component for TootOttoComputer {
                         <small>{"(Winning Combination: "}{&self.player_name}{" - "}<b>{"TOOT"}</b>{" and Computer - "}<b>{"OTTO"}</b>{")"}</small>
                     </div>
                     <br></br>
-                    <TootOttoBoard />
+                    <TootOttoBoard player1_name=&self.player_name player2_name="Computer", difficulty=self.difficulty />
                 </div>
             </div>
         }

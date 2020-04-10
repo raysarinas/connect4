@@ -86,6 +86,7 @@ impl Component for Connect4Computer {
                 <div hidden=!self.info_submitted>
                     <h4>{"New Game: "}{&self.player_name}{" vs. Computer"}</h4>
                     <small>{"(Disc Colors: "}{&self.player_name}{" - "}<b>{"Red"}</b>{" and Computer - "}<b>{"Yellow"}</b>{")"}</small>
+                    <br></br>
                     <ConnectFourBoard />
                 </div>
             </div>

@@ -64,6 +64,7 @@ impl Component for Connect4Human {
                 <div hidden=!self.info_submitted>
                     <h4>{"New Game: "}{&self.player1_name}{" vs. "}{&self.player2_name}</h4>
                     <small>{"(Disc Colors: "}{&self.player1_name}{" - "}<b>{"Red"}</b>{" and "}{&self.player2_name}{" - "}<b>{"Yellow"}</b>{")"}</small>
+                    <br></br>
                     <ConnectFourBoard />
                 </div>
             </div>

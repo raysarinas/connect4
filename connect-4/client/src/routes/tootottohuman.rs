@@ -1,4 +1,5 @@
 use crate::toot_otto::board::*;
+use crate::game_elements::Difficulty;
 
 use yew::prelude::*;
 
@@ -67,7 +68,7 @@ impl Component for TootOttoHuman {
                         <small>{"(Winning Combination: "}{&self.player1_name}{" - "}<b>{"TOOT"}</b>{" and "}{&self.player2_name}{" - "}<b>{"OTTO"}</b>{")"}</small>
                     </div>
                     <br></br>
-                    <TootOttoBoard />
+                    <TootOttoBoard player1_name=&self.player1_name player2_name=&self.player2_name, difficulty=&Difficulty::Easy />
                 </div>
             </div>
         }

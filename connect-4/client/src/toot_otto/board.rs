@@ -1,12 +1,13 @@
+use crate::game_elements::Difficulty;
+
 use yew::prelude::*;
 
 pub struct TootOttoBoard {
     link: ComponentLink<Self>,
-    token: Token
-}
-
-pub enum Msg {
-    GotToken(Token),
+    token: Token,
+    player1: Player,
+    player2: Player,
+    difficulty: Difficulty
 }
 
 #[derive(PartialEq)]
@@ -15,40 +16,71 @@ pub enum Token {
     O
 }
 
+pub struct Player {
+    player_name: String,
+    token: Token
+}
+
+pub enum Msg {
+    GotToken(Token),
+    ClickedToken(usize, usize)
+}
+
+#[derive(Properties, Clone)]
+pub struct Props {
+    pub player1_name: String,
+    pub player2_name: String,
+    pub difficulty: Difficulty
+}
+
 impl Component for TootOttoBoard {
     type Message = Msg;
-    type Properties = ();
+    type Properties = Props;
 
-    fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(p: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let player1 = Player {
+            player_name: p.player1_name,
+            token: Token::T
+        };
+
+        let player2 = Player {
+            player_name: p.player2_name,
+            token: Token::O
+        };
+
         TootOttoBoard {
             link,
-            token: Token::T
+            token: Token::T,
+            player1: player1,
+            player2: player2,
+            difficulty: p.difficulty
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::GotToken(token) => self.token = token
+            Msg::GotToken(token) => self.token = token,
+            Msg::ClickedToken(row, col) => {}
         }
         true
     }
 
     fn view(&self) -> Html {
-        let col = || {
+        let col = |r, c| {
             html! {
-                <td class="board_column">{""}</td>
+                <td class="board_column" onclick=self.link.callback(move |_| Msg::ClickedToken(r, c))>{""}</td>
             }
         };
 
-        let row = || {
+        let row = |r| {
             html! {
                 <tr>
-                    {col()}
-                    {col()}
-                    {col()}
-                    {col()}
-                    {col()}
-                    {col()}
+                    {col(r, 0)}
+                    {col(r, 1)}
+                    {col(r, 2)}
+                    {col(r, 3)}
+                    {col(r, 4)}
+                    {col(r, 5)}
                 </tr>
             }
         };
@@ -76,10 +108,10 @@ impl Component for TootOttoBoard {
                     </form>
                 </div>
                 <table class="board">
-                    {row()}
-                    {row()}
-                    {row()}
-                    {row()}
+                    {row(0)}
+                    {row(1)}
+                    {row(2)}
+                    {row(3)}
                 </table>
                 <br></br>
             </div>
