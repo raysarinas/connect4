@@ -1,5 +1,3 @@
-use crate::game_elements::board::*;
-
 use yew::prelude::*;
 
 pub struct ConnectFourBoard {}
@@ -17,9 +15,37 @@ impl Component for ConnectFourBoard {
     }
 
     fn view(&self) -> Html {
-        html!{
+        let col = || {
+            html! {
+                <td class="board_column">{""}</td>
+            }
+        };
+
+        let row = || {
+            html! {
+                <tr>
+                    {col()}
+                    {col()}
+                    {col()}
+                    {col()}
+                    {col()}
+                    {col()}
+                    {col()}
+                </tr>
+            }
+        };
+
+        html! {
             <div>
-                <Board rows=6 cols=7 />
+                <table class="board">
+                    {row()}
+                    {row()}
+                    {row()}
+                    {row()}
+                    {row()}
+                    {row()}
+                </table>
+                <br></br>
             </div>
         }
     }
