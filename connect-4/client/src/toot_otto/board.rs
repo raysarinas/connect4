@@ -68,7 +68,7 @@ impl Component for TootOttoBoard {
                         Err(e) => println!("Err: {}", e), // TODO: do something with this
                     }
 
-                    // if self.player2_name == "Computer", make ai move here i guess
+                    // if self.props.player2_name == "Computer", make ai move here i guess
                 }
             }
         }
@@ -238,7 +238,7 @@ impl TootOttoBoard {
                 return;
             }
             1 => {
-                let winner = if winners.contains(&Turn::First) {
+                let winner = if winners.contains(&Token::T) {
                     &self.props.player1_name
                 } else {
                     &self.props.player2_name
@@ -256,7 +256,7 @@ impl TootOttoBoard {
         }
     }
 
-    fn find_winners(&self) -> HashSet<&Turn> {
+    fn find_winners(&self) -> HashSet<&Token> {
         let rows = 4;
         let cols = 6;
         let mut winners_set = HashSet::new();
@@ -281,7 +281,7 @@ impl TootOttoBoard {
                     && self.token_is_at((row, col + 2), opposite)
                     && self.token_is_at((row, col + 3), token)
                 {
-                    winners_set.insert(&self.turn);
+                    winners_set.insert(token);
                     continue;
                 }
 
@@ -291,7 +291,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col), opposite)
                         && self.token_is_at((row + 3, col), token)
                     {
-                        winners_set.insert(&self.turn);
+                        winners_set.insert(token);
                         continue;
                     }
 
@@ -301,7 +301,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col + 2), opposite)
                         && self.token_is_at((row + 3, col + 3), token)
                     {
-                        winners_set.insert(&self.turn);
+                        winners_set.insert(token);
                         continue;
                     }
 
@@ -311,7 +311,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col - 2), opposite)
                         && self.token_is_at((row + 3, col - 3), token)
                     {
-                        winners_set.insert(&self.turn);
+                        winners_set.insert(token);
                         continue;
                     }
                 }
