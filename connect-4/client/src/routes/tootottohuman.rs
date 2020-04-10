@@ -6,21 +6,13 @@ pub struct TootOttoHuman {
     link: ComponentLink<Self>,
     player1_name: String,
     player2_name: String,
-    toot_char: TootChar,
     info_submitted: bool
 }
 
 pub enum Msg {
     GotPlayer1Name(String),
     GotPlayer2Name(String),
-    GotTootChar(TootChar),
     StartGame
-}
-
-#[derive(PartialEq)]
-pub enum TootChar {
-    T,
-    O
 }
 
 impl Component for TootOttoHuman {
@@ -32,7 +24,6 @@ impl Component for TootOttoHuman {
             link,
             player1_name: "".into(),
             player2_name: "".into(),
-            toot_char: TootChar::T,
             info_submitted: false
         }
     }
@@ -41,7 +32,6 @@ impl Component for TootOttoHuman {
         match msg {
             Msg::GotPlayer1Name(name) => self.player1_name = name,
             Msg::GotPlayer2Name(name) => self.player2_name = name,
-            Msg::GotTootChar(toot_char) => self.toot_char = toot_char,
             Msg::StartGame => {
                 self.info_submitted = true;
                 // disable start game button here
@@ -77,26 +67,6 @@ impl Component for TootOttoHuman {
                         <small>{"(Winning Combination: "}{&self.player1_name}{" - "}<b>{"TOOT"}</b>{" and "}{&self.player2_name}{" - "}<b>{"OTTO"}</b>{")"}</small>
                     </div>
                     <br></br>
-                    <div>
-                        <form>
-                            <h4>{"Select a Disc Type   : "}
-                                <input
-                                    name="tootchar"
-                                    type="radio"
-                                    id="T"
-                                    checked={self.toot_char == TootChar::T}
-                                    onclick=self.link.callback(|_| Msg::GotTootChar(TootChar::T))/>
-                                <label for="T">{" T "}</label>
-                                <input
-                                    name="tootchar"
-                                    type="radio"
-                                    id="O"
-                                    checked={self.toot_char == TootChar::O}
-                                    onclick=self.link.callback(|_| Msg::GotTootChar(TootChar::O))/>
-                                <label for="O">{" O"}</label>
-                            </h4>
-                        </form>
-                    </div>
                     <TootOttoBoard />
                 </div>
             </div>
