@@ -33,10 +33,7 @@ impl Component for Connect4Human {
         match msg {
             Msg::GotPlayer1Name(name) => self.player1_name = name,
             Msg::GotPlayer2Name(name) => self.player2_name = name,
-            Msg::StartGame => {
-                self.info_submitted = true;
-                // disable start game button here
-            }
+            Msg::StartGame => self.info_submitted = true
         }
         true
     }
@@ -58,7 +55,11 @@ impl Component for Connect4Human {
                             value=&self.player2_name
                             oninput=self.link.callback(|e: InputData| Msg::GotPlayer2Name(e.value))
                             placeholder="Player 2's Name"/>
-                        <button onclick=self.link.callback(|_| Msg::StartGame)>{"Start Game"}</button>
+                        <button
+                            disabled=self.info_submitted
+                            onclick=self.link.callback(|_| Msg::StartGame)>
+                            {"Start Game"}
+                        </button>
                     </div>
                 </div>
                 <br></br>

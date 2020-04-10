@@ -33,10 +33,7 @@ impl Component for TootOttoHuman {
         match msg {
             Msg::GotPlayer1Name(name) => self.player1_name = name,
             Msg::GotPlayer2Name(name) => self.player2_name = name,
-            Msg::StartGame => {
-                self.info_submitted = true;
-                // disable start game button here
-            }
+            Msg::StartGame => self.info_submitted = true
         }
         true
     }
@@ -58,7 +55,11 @@ impl Component for TootOttoHuman {
                             value=&self.player2_name
                             oninput=self.link.callback(|e: InputData| Msg::GotPlayer2Name(e.value))
                             placeholder="Player 2's Name"/>
-                        <button onclick=self.link.callback(|_| Msg::StartGame)>{"Start Game"}</button>
+                        <button
+                            disabled=self.info_submitted
+                            onclick=self.link.callback(|_| Msg::StartGame)>
+                            {"Start Game"}
+                        </button>
                     </div>
                 </div>
                 <br></br>
@@ -66,6 +67,8 @@ impl Component for TootOttoHuman {
                     <div>
                         <h4>{"New Game: "}{&self.player1_name}{" vs. "}{&self.player2_name}</h4>
                         <small>{"(Winning Combination: "}{&self.player1_name}{" - "}<b>{"TOOT"}</b>{" and "}{&self.player2_name}{" - "}<b>{"OTTO"}</b>{")"}</small>
+                        <br></br>
+                        <small>{"(Disc Colors: "}{&self.player1_name}{" - "}<b>{"Green"}</b>{" and "}{&self.player2_name}{" - "}<b>{"Yellow"}</b>{")"}</small>
                     </div>
                     <br></br>
                     <TootOttoBoard player1_name=&self.player1_name player2_name=&self.player2_name, difficulty=&Difficulty::Easy />

@@ -40,10 +40,7 @@ impl Component for Connect4Computer {
                     _ => unreachable!()
                 }
             }
-            Msg::StartGame => {
-                self.info_submitted = true;
-                // disable start game button here
-            }
+            Msg::StartGame => self.info_submitted = true
         }
         true
     }
@@ -75,7 +72,11 @@ impl Component for Connect4Computer {
                         </select>
                     </div>
                     <br></br>
-                    <button onclick=self.link.callback(|_| Msg::StartGame)>{"Start Game"}</button>
+                    <button
+                        disabled=self.info_submitted
+                        onclick=self.link.callback(|_| Msg::StartGame)>
+                        {"Start Game"}
+                    </button>
                 </div>
                 <br></br>
                 <div hidden=!self.info_submitted>
