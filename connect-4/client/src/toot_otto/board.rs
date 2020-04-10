@@ -6,7 +6,8 @@ pub struct TootOttoBoard {
     link: ComponentLink<Self>,
     props: Props,
     selected_token: Token,
-    turn: Turn
+    turn: Turn,
+    clicked_tokens: Vec<Vec<bool>>,
 }
 
 #[derive(PartialEq)]
@@ -27,6 +28,15 @@ pub struct Props {
     pub difficulty: Difficulty
 }
 
+impl TootOttoBoard {
+    fn draw_token(&self) -> String {
+        match &self.selected_token {
+            T => "T".to_string(),
+            O => "O".to_string(),
+        }
+    }
+}
+
 impl Component for TootOttoBoard {
     type Message = Msg;
     type Properties = Props;
@@ -36,7 +46,8 @@ impl Component for TootOttoBoard {
             link,
             props: props,
             selected_token: Token::T,
-            turn: Turn::First
+            turn: Turn::First,
+            clicked_tokens: vec![vec![false; 7]; 4],
         }
     }
 
@@ -53,7 +64,9 @@ impl Component for TootOttoBoard {
             Msg::GotToken(token) => self.selected_token = token,
             Msg::Clicked(row, col) => {
                 // draw token here
-
+                if !self.clicked_tokens[row][col] {
+                    self.clicked_tokens[row][col] = true;
+                }
                 self.turn.next();
             }
         }
@@ -63,7 +76,9 @@ impl Component for TootOttoBoard {
     fn view(&self) -> Html {
         let col = |r, c| {
             html! {
-                <td class="board_column" onclick=self.link.callback(move |_| Msg::Clicked(r, c))>{""}</td>
+                <td class="board_column" onclick=self.link.callback(move |_| Msg::Clicked(r, c))>
+                <div hidden=!self.clicked_tokens[r][c] >{ self.draw_token() }</div>
+                </td>
             }
         };
 
