@@ -51,7 +51,6 @@ a {
 .board {
 	background: #00bfff;
 	border: 5px solid #00bfff;
-	border-collapse: collapse;
 	width: 440px;
 }
 
@@ -59,10 +58,17 @@ a {
 	height: 60px;
 	width: 60px;
 	background: #fff;
-	border-left: 5px solid #00bfff;
-	border-right: 5px solid #00bfff;
+	border: 5px solid #00bfff;
 }
 
 .board_column:hover {
 	opacity: 0.4;
+}
+
+.green {
+	background: #99ffcc;
+}
+
+.yellow {
+	background: #ffff99;
 }
