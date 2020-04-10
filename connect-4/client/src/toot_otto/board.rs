@@ -8,11 +8,12 @@ pub struct TootOttoBoard {
     link: ComponentLink<Self>,
     props: Props,
     board: HashMap<Coord, Token>,
+    turn_map: HashMap<Coord, Turn>,
     selected_token: Token,
     turn: Turn
 }
 
-#[derive(Clone, Debug, PartialEq, Hash, Eq, Copy)]
+#[derive(Clone, PartialEq, Hash, Eq, Copy)]
 pub enum Token {
     T,
     O
@@ -39,6 +40,7 @@ impl Component for TootOttoBoard {
             link,
             props: props,
             board: HashMap::new(),
+            turn_map: HashMap::new(),
             selected_token: Token::T,
             turn: Turn::First
         }
@@ -56,7 +58,7 @@ impl Component for TootOttoBoard {
         match msg {
             Msg::GotToken(token) => self.selected_token = token,
             Msg::Clicked(row, col) => {
-                match self.drop(col, self.selected_token) {
+                match self.drop(col, self.selected_token, self.turn) {
                     Ok(()) => self.turn.next(),
                     Err(e) => println!("Err: {}", e), // TODO: do something with this
                 }
@@ -76,12 +78,11 @@ impl Component for TootOttoBoard {
             None => ""
         };
 
-        // TODO: color is wrong, fix
-        let get_cell_color = |r, c| match self.get_token_at((r,c)) {
-            Some(token) => {
-                match &token {
-                    Token::T => "green",
-                    Token::O => "yellow"
+        let get_cell_color = |r, c| match self.get_turn_at((r,c)) {
+            Some(turn) => {
+                match &turn {
+                    Turn::First => "green",
+                    Turn::Second => "yellow"
                 }
             },
             None => ""
@@ -150,10 +151,10 @@ impl Component for TootOttoBoard {
 
 impl TootOttoBoard {
     // Bottom left is 0, 0
-    fn drop(&mut self, col: Dim, token: Token) -> Result<(), &'static str> {
+    fn drop(&mut self, col: Dim, token: Token, turn: Turn) -> Result<(), &'static str> {
         match self.next_free_row(col) {
             Some(row) => {
-                self.put_token_at((row, col), token);
+                self.put_token_at((row, col), token, turn);
                 self.check();
                 Ok(())
             }
@@ -171,13 +172,19 @@ impl TootOttoBoard {
 
     // set the token at a given location on the board
     // assert that there were no tokens there before
-    fn put_token_at(&mut self, coord: Coord, token: Token) {
+    fn put_token_at(&mut self, coord: Coord, token: Token, turn: Turn) {
         self.board.insert(coord, token);
+        self.turn_map.insert(coord, turn);
     }
 
     // Get the token at a given location on the board
     fn get_token_at(&self, coord: Coord) -> Option<&Token> {
         self.board.get(&coord)
+    }
+
+    // Get the turn at a given location on the board
+    fn get_turn_at(&self, coord: Coord) -> Option<&Turn> {
+        self.turn_map.get(&coord)
     }
 
     // Given a col, check the next free row

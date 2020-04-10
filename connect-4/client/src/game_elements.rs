@@ -14,6 +14,7 @@ pub enum Difficulty {
     Hard
 }
 
+#[derive(Clone, PartialEq, Hash, Eq, Copy)]
 pub enum Turn {
     First,
     Second,
