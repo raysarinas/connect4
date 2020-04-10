@@ -3,6 +3,14 @@ use crate::game_elements::*;
 use std::collections::{HashSet, HashMap};
 
 use yew::prelude::*;
+use serde_json::json;
+use serde_json::ser;
+use yew::format::{Json, Nothing};
+use yew::services::fetch::{FetchService, FetchTask, Request, Response};
+use anyhow::Error;
+use bson::UtcDateTime;
+use chrono::{DateTime, Utc};
+use common::Game;
 
 pub struct TootOttoBoard {
     link: ComponentLink<Self>,
@@ -12,7 +20,15 @@ pub struct TootOttoBoard {
     selected_token: Token,
     turn: Turn,
     game_over: bool,
-    winner: String
+    winner: String,
+    ft: Option<FetchTask>,
+    state: State,
+}
+
+pub struct State {
+    link: ComponentLink<TootOttoBoard>,
+    fetching: bool,
+    json_value: Option<Game>,
 }
 
 #[derive(Clone, PartialEq, Hash, Eq, Copy)]
@@ -23,7 +39,10 @@ pub enum Token {
 
 pub enum Msg {
     GotToken(Token),
-    Clicked(Dim, Dim)
+    Clicked(Dim, Dim),
+    Fetch,
+    FetchComplete(Result<String, Error>),
+    FetchFailed,
 }
 
 #[derive(PartialEq, Properties, Clone)]
@@ -38,6 +57,12 @@ impl Component for TootOttoBoard {
     type Properties = Props;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let mut state = State {
+            link: link.clone(),
+            fetching: true,
+            json_value: None,
+        };
+
         TootOttoBoard {
             link,
             props: props,
@@ -46,7 +71,9 @@ impl Component for TootOttoBoard {
             selected_token: Token::T,
             turn: Turn::First,
             game_over: false,
-            winner: "".into()
+            winner: "".into(),
+            ft: None, //Some(task),
+            state,
         }
     }
 
@@ -67,9 +94,20 @@ impl Component for TootOttoBoard {
                         Ok(()) => self.turn.next(),
                         Err(e) => println!("Err: {}", e), // TODO: do something with this
                     }
-
-                    // if self.props.player2_name == "Computer", make ai move here i guess
+                    // if self.player2_name == "Computer", make ai move here i guess
                 }
+            },
+            Msg::Fetch => {
+                let task = self.state.post_game(&self.props, &self.winner);
+                self.ft = Some(task);
+            },
+            Msg::FetchComplete(body) => {
+                self.state.fetching = false;
+                // self.state.json_value = body.map(|data| data).ok();
+            },
+            Msg::FetchFailed => {
+                self.state.json_value = None;
+                return false;
             }
         }
         true
@@ -122,12 +160,6 @@ impl Component for TootOttoBoard {
             Turn::Second => &self.props.player2_name
         };
 
-        let get_result = || if self.winner.is_empty() {
-            html! { <h1><b>{"It's a draw"}</b></h1> }
-        } else {
-            html! { <h1><b>{&self.winner}{" wins"}</b></h1> }
-        };
-
         html! {
             <div>
                 <div>
@@ -152,7 +184,7 @@ impl Component for TootOttoBoard {
                     <h4>{"Turn   : "}{turn()}</h4>
                 </div>
                 <div hidden=!self.game_over>
-                    {get_result()}
+                    <h1><b>{"Winner: "}{format!("{}", &self.winner)}</b></h1>
                 </div>
                 <table class="board">
                     {row(3)}
@@ -235,10 +267,11 @@ impl TootOttoBoard {
         match winners.len() {
             2 => {
                 self.game_over = true;
+                self.post_game();
                 return;
             }
             1 => {
-                let winner = if winners.contains(&Token::T) {
+                let winner = if winners.contains(&Turn::First) {
                     &self.props.player1_name
                 } else {
                     &self.props.player2_name
@@ -246,17 +279,24 @@ impl TootOttoBoard {
 
                 self.winner = winner.to_string();
                 self.game_over = true;
+                self.post_game();
                 return;
             }
             _ => {}
         };
 
         if self.is_full() {
+            self.winner = "Tie".to_string();
             self.game_over = true;
+            self.post_game();
         }
     }
 
-    fn find_winners(&self) -> HashSet<&Token> {
+    fn post_game(&mut self) {
+        self.state.post_game(&self.props, &self.winner);
+    }
+
+    fn find_winners(&self) -> HashSet<&Turn> {
         let rows = 4;
         let cols = 6;
         let mut winners_set = HashSet::new();
@@ -281,7 +321,7 @@ impl TootOttoBoard {
                     && self.token_is_at((row, col + 2), opposite)
                     && self.token_is_at((row, col + 3), token)
                 {
-                    winners_set.insert(token);
+                    winners_set.insert(&self.turn);
                     continue;
                 }
 
@@ -291,7 +331,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col), opposite)
                         && self.token_is_at((row + 3, col), token)
                     {
-                        winners_set.insert(token);
+                        winners_set.insert(&self.turn);
                         continue;
                     }
 
@@ -301,7 +341,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col + 2), opposite)
                         && self.token_is_at((row + 3, col + 3), token)
                     {
-                        winners_set.insert(token);
+                        winners_set.insert(&self.turn);
                         continue;
                     }
 
@@ -311,7 +351,7 @@ impl TootOttoBoard {
                         && self.token_is_at((row + 2, col - 2), opposite)
                         && self.token_is_at((row + 3, col - 3), token)
                     {
-                        winners_set.insert(token);
+                        winners_set.insert(&self.turn);
                         continue;
                     }
                 }
@@ -319,5 +359,34 @@ impl TootOttoBoard {
         }
 
         winners_set
+    }
+}
+
+impl State {
+    fn post_game(&mut self, props: &Props, winner: &String) -> FetchTask {
+        let new_game = Game {
+            gameNumber: "1".to_string(),
+            gameType: "TOOT-OTTO".to_string(),
+            Player1Name: props.player1_name.clone(),
+            Player2Name: props.player2_name.clone(),
+            WinnerName: winner.to_string(),
+            GameDate: "".to_string(),
+        };
+
+        let post_request = Request::post("/games")
+            .body(Json(&new_game))
+            .expect("Failed to build request");
+
+        let callback = self.link.callback(
+            | response: Response<Result<String, Error>>| {
+                if response.status().is_success() {
+                    Msg::Fetch
+                }
+                else {
+                    Msg::FetchFailed
+                }
+            },
+        );
+        FetchService::new().fetch(post_request, callback).unwrap()
     }
 }

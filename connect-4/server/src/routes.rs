@@ -38,7 +38,7 @@ pub fn get_all_games(conn: Mongoose) -> Json<Vec<String>> {
 }
 
 #[post("/games", data = "<game>")]
-pub fn create_game(conn: Mongoose, game: Json<Game>) -> content::Json<String> {
+pub fn create_game(conn: Mongoose, game: Json<Game>) -> Json<String> {
     let inner = game.into_inner();
     let doc = doc! {
         "gameNumber": inner.gameNumber,
@@ -53,7 +53,7 @@ pub fn create_game(conn: Mongoose, game: Json<Game>) -> content::Json<String> {
     let mut cursor = coll
                     .insert_one(doc, None);
     
-    content::Json(format!("INSERTED THE DOC = {:?}", test))
+    Json(format!("INSERTED THE DOC = {:?}", test))
 }
 
 #[put("/games/<id>", data = "<game>")]
