@@ -122,6 +122,12 @@ impl Component for TootOttoBoard {
             Turn::Second => &self.props.player2_name
         };
 
+        let get_result = || if self.winner.is_empty() {
+            html! { <h1><b>{"It's a draw"}</b></h1> }
+        } else {
+            html! { <h1><b>{&self.winner}{" wins"}</b></h1> }
+        };
+
         html! {
             <div>
                 <div>
@@ -146,7 +152,7 @@ impl Component for TootOttoBoard {
                     <h4>{"Turn   : "}{turn()}</h4>
                 </div>
                 <div hidden=!self.game_over>
-                    <h1><b>{&self.winner}{" wins"}</b></h1>
+                    {get_result()}
                 </div>
                 <table class="board">
                     {row(3)}
