@@ -1,4 +1,5 @@
 use crate::connect_four::board::*;
+use crate::game_elements::Difficulty;
 
 use yew::prelude::*;
 
@@ -13,12 +14,6 @@ pub enum Msg {
     GotPlayerName(String),
     GotDifficulty(String),
     StartGame
-}
-
-pub enum Difficulty {
-    Easy,
-    Medium,
-    Hard
 }
 
 impl Component for Connect4Computer {
@@ -87,7 +82,9 @@ impl Component for Connect4Computer {
                     <h4>{"New Game: "}{&self.player_name}{" vs. Computer"}</h4>
                     <small>{"(Disc Colors: "}{&self.player_name}{" - "}<b>{"Red"}</b>{" and Computer - "}<b>{"Yellow"}</b>{")"}</small>
                     <br></br>
-                    <ConnectFourBoard />
+                    <small>{"(Disc Type: "}{&self.player_name}{" - "}<b>{"R"}</b>{" and Computer - "}<b>{"Y"}</b>{")"}</small>
+                    <br></br>
+                    <ConnectFourBoard player1_name=&self.player_name player2_name="Computer", difficulty=self.difficulty />
                 </div>
             </div>
         }

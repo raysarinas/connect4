@@ -66,6 +66,14 @@ a {
 	opacity: 0.4;
 }
 
+.red {
+	background: #ff4136;
+}
+
+.bright_yellow {
+	background: #ffff00;
+}
+
 .green {
 	background: #99ffcc;
 }

@@ -1,4 +1,5 @@
 use crate::connect_four::board::*;
+use crate::game_elements::Difficulty;
 
 use yew::prelude::*;
 
@@ -65,7 +66,9 @@ impl Component for Connect4Human {
                     <h4>{"New Game: "}{&self.player1_name}{" vs. "}{&self.player2_name}</h4>
                     <small>{"(Disc Colors: "}{&self.player1_name}{" - "}<b>{"Red"}</b>{" and "}{&self.player2_name}{" - "}<b>{"Yellow"}</b>{")"}</small>
                     <br></br>
-                    <ConnectFourBoard />
+                    <small>{"(Disc Type: "}{&self.player1_name}{" - "}<b>{"R"}</b>{" and "}{&self.player2_name}{" - "}<b>{"Y"}</b>{")"}</small>
+                    <br></br>
+                    <ConnectFourBoard player1_name=&self.player1_name player2_name=&self.player2_name, difficulty=&Difficulty::Easy />
                 </div>
             </div>
         }
