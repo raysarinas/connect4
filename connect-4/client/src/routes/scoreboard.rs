@@ -67,10 +67,10 @@ impl Component for ScoreBoard {
     
     // VIEW
     fn view(&self) -> Html {
-        let comprow = |g: &Game| {
+        let comprow = |(index, g): (usize, &Game)| {
             html! {
                 <tr>
-                    <td>{"123"}</td>
+                    <td>{index + 1}</td>
                     <td>{g.gameType.clone()}</td>
                     <td>{g.WinnerName.clone()}</td>
                     <td>{g.Player1Name.clone()}</td>
@@ -79,12 +79,12 @@ impl Component for ScoreBoard {
             }
         };
 
-        let winrow = |(winner, num)| {
+        let winrow = |(index, (winner, num))| {
             html! {
                 <tr>
-                    <td>{"123"}</td>
-                    <td>{ winner }</td>
-                    <td>{ num }</td>
+                    <td>{index + 1}</td>
+                    <td>{winner}</td>
+                    <td>{num}</td>
                 </tr>
             }
         };
@@ -125,7 +125,7 @@ impl Component for ScoreBoard {
                         </tr>
                     </thead>
                         <tbody>
-                        { for self.get_games_computer().iter().map(comprow) }
+                        { for self.get_games_computer().iter().enumerate().map(comprow) }
                         </tbody>
                     </table>
                 </div>
@@ -141,7 +141,7 @@ impl Component for ScoreBoard {
                         </tr>
                     </thead>
                         <tbody>
-                            { for self.get_win_map().iter().map(winrow) }
+                            { for self.get_win_map().iter().enumerate().map(winrow) }
                         </tbody>
                     </table>
                 </div>

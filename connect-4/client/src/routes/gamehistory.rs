@@ -67,10 +67,10 @@ impl Component for GameHistory {
     
     // VIEW
     fn view(&self) -> Html {
-        let row = |g: &Game| {
+        let row = |(index, g): (usize, &Game)| {
             html! {
                 <tr>
-                    <td>{"123"}</td>
+                    <td>{index + 1}</td>
                     <td>{g.gameType.clone()}</td>
                     <td>{g.Player1Name.clone()}</td>
                     <td>{g.Player2Name.clone()}</td>
@@ -96,7 +96,7 @@ impl Component for GameHistory {
                         </tr>
                     </thead>
                         <tbody>
-                            { for self.get_gamevec().iter().map(row) }
+                            { for self.get_gamevec().iter().enumerate().map(row) }
                         </tbody>
                     </table>
                 </div>
