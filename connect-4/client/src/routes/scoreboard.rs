@@ -153,8 +153,8 @@ impl Component for ScoreBoard {
 impl ScoreBoard {
 
     fn get_agame(val: &str) -> Game {
-        let Game: Game = serde_json::from_str(val).unwrap();
-        Game
+        let game: Game = serde_json::from_str(val).unwrap();
+        game
     }
 
     fn get_gamevec(&self) -> Vec<Game> {
