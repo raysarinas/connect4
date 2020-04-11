@@ -6,7 +6,7 @@ use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use anyhow::Error;
 use bson::UtcDateTime;
 use chrono::{DateTime, Utc};
-
+use std::collections::HashMap;
 use common::{Game};
 
 pub struct GameHistory {
@@ -67,6 +67,10 @@ impl Component for GameHistory {
     
     // VIEW
     fn view(&self) -> Html {
+        // let parse_date = |date: String| {
+        //     let ms: i64 = date.parse::<i64>();
+        //     let stamp = Utc.timestamp(1_500_000_000, 0);
+        // }
         let row = |(index, g): (usize, &Game)| {
             html! {
                 <tr>
@@ -107,8 +111,23 @@ impl Component for GameHistory {
 
 impl GameHistory {
     fn get_agame(val: &str) -> Game {
-        let game: Game = serde_json::from_str(val).unwrap();
-        game
+        // let game: Game = serde_json::from_str(val).unwrap();
+        let split = val.replace("\"", "")
+                .replace("{_id:{$", "").replace("{$date:{$numberLong:", "").replace("}", "")
+                .split(',')
+                .map(|kv| kv.split(':'))
+                .map(|mut kv| (kv.next().unwrap().into(),
+                            kv.next().unwrap().into()))
+                .collect::<HashMap<String, String>>();
+
+        Game {
+            gameNumber: split["gameNumber"].clone(),
+            gameType: split["gameType"].clone(),
+            Player1Name: split["Player1Name"].clone(),
+            Player2Name: split["Player2Name"].clone(),
+            WinnerName: split["WinnerName"].clone(),
+            GameDate: split["GameDate"].clone(),
+        }
     }
 
     fn get_gamevec(&self) -> Vec<Game> {
