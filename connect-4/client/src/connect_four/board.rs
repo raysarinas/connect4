@@ -5,13 +5,9 @@ use crate::connect_four::bot::Bot;
 use std::collections::HashMap;
 
 use yew::prelude::*;
-use serde_json::json;
-use serde_json::ser;
-use yew::format::{Json, Nothing};
+use yew::format::Json;
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use anyhow::Error;
-use bson::UtcDateTime;
-use chrono::{DateTime, Utc};
 use common::Game;
 use yew::services::console::ConsoleService;
 
@@ -356,7 +352,7 @@ impl ConnectFourBoard {
 impl State {
     fn post_game(&mut self, props: &Props, winner: &String) -> FetchTask {
         self.console.log("posting game");
-        let mut winner_str = || if winner.is_empty() {
+        let winner_str = || if winner.is_empty() {
             "Tie".to_string()
         } else {
             winner.clone()

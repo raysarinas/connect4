@@ -1,10 +1,7 @@
 use yew::prelude::*;
-use serde_json::json;
-use serde_json::ser;
 use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use anyhow::Error;
-use bson::UtcDateTime;
 use chrono::{DateTime, Utc, NaiveDateTime};
 use std::collections::HashMap;
 use common::{Game};
@@ -89,21 +86,15 @@ impl Component for ScoreBoard {
             }
         };
 
-        let winrow = |(index, (winner, num))| {
+        let winrow = |(index, tup): (usize, &(String, usize))| {
             html! {
                 <tr>
                     <td>{index + 1}</td>
-                    <td>{winner}</td>
-                    <td>{num}</td>
+                    <td>{tup.0.clone()}</td>
+                    <td>{tup.1}</td>
                 </tr>
             }
         };
-
-        // let sorted = |map: HashMap<String, usize>| {
-        //     let mut v: Vec<_> = map.iter().collect();
-        //     v.sort_by(|a, b| b.1.cmp(&a.1));
-        //     v
-        // };
 
         html! {
             <div>
@@ -157,8 +148,7 @@ impl Component for ScoreBoard {
                         </tr>
                     </thead>
                         <tbody>
-                        // sorted(map).to_vec()
-                            { for self.get_win_map().iter().enumerate().map(winrow) }
+                            { for self.get_wins().iter().enumerate().map(winrow) }
                         </tbody>
                     </table>
                 </div>
@@ -212,26 +202,17 @@ impl ScoreBoard {
         self.get_gamevec().len().to_string()
     }
 
-    // fn get_win_vec(&self) -> Vec<(String, usize)> {
-    //     let map = self.get_win_map();
-    //     // let mut v: Vec<_> = map.iter().collect();
-    //     // v.sort_by(|a, b| b.1.cmp(&a.1));
-    //     let sorted = |map: HashMap<String, usize>| {
-    //         let mut v: Vec<_> = map.iter().collect();
-    //         v.sort_by(|a, b| b.1.cmp(&a.1));
-    //         v
-    //     };
-    //     sorted(map).to_vec()
-    // }
-
-    fn get_win_map(&self) -> HashMap<String, usize> {
-        self.get_gamevec().iter()
+    fn get_wins(&self) -> Vec<(String, usize)> {
+        let map = self.get_gamevec().iter()
             .fold(HashMap::new(), |mut acc, doc| {
                 acc.entry(doc.WinnerName.clone())
                     .and_modify(|e| { *e += 1 })
                     .or_insert_with(|| 1);
             acc
-        })
+        });
+        let mut wins: Vec<_> = map.iter().map(|(u, v)| (u.clone(), *v)).collect();
+        wins.sort_by(|a, b| b.1.cmp(&a.1));
+        wins
     }
 
 }

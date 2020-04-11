@@ -2,25 +2,17 @@ use crate::rocket_contrib;
 use crate::rocket_contrib::databases::mongodb::db::ThreadedDatabase;
 use crate::Mongoose;
 
-use rocket::response::content;
-use rocket_contrib::{databases::mongodb};
-use rocket_contrib::json::Json;
+use rocket_contrib::{databases::mongodb, json::Json};
 use mongodb::{doc, bson};
-use mongodb::coll::options;
-use mongodb::oid;
-
-use serde::{Serialize, Deserialize};
 use serde_json::ser;
-use bson::UtcDateTime;
-use bson::oid::ObjectId;
 use bson::Bson;
 use chrono::prelude::*;
-use common::{Game};
+use common::Game;
 
 #[get("/games")]
 pub fn get_all_games(conn: Mongoose) -> Json<Vec<String>> {
     let coll = conn.collection("games");
-    let mut cursor = coll
+    let cursor = coll
                     .find(Some(doc! {}), None)
                     .ok()
                     .expect("Failed to execute find.");
@@ -48,16 +40,17 @@ pub fn create_game(conn: Mongoose, game: Json<Game>) -> Json<String> {
         "WinnerName": inner.WinnerName,
         "GameDate": Bson::UtcDatetime(Utc::now()),//Bson::UtcDatetime(inner.GameDate.0),
     };
-    let test = doc.clone();
+
+    let created = doc.clone();
     let coll = conn.collection("games");
-    let mut cursor = coll
-                    .insert_one(doc, None);
+    coll.insert_one(doc, None)
+        .expect("should have inserted i guess");
     
-    Json(format!("INSERTED THE DOC = {:?}", test))
+    Json(format!("inserted game: {:?}", created))
 }
 
 #[put("/games/<id>", data = "<game>")]
-pub fn update_game(conn: Mongoose, id: String, game: Json<Game>) -> content::Json<String> {
+pub fn update_game(conn: Mongoose, id: String, game: Json<Game>) -> Json<String> {
     let inner = game.into_inner();
     let coll = conn.collection("games");
 
@@ -66,26 +59,26 @@ pub fn update_game(conn: Mongoose, id: String, game: Json<Game>) -> content::Jso
 
     coll.update_one(filter.clone(), update, None).unwrap();
 
-    content::Json(format!("{:?}", filter))
+    Json(format!("updated game with id: {:?}", filter))
 }
 
 #[get("/games/<id>")]
-pub fn get_game(conn: Mongoose, id: String) -> content::Json<String> {
+pub fn get_game(conn: Mongoose, id: String) -> Json<String> {
     let coll = conn.collection("games");
 
-    let mut gg = coll.find_one(Some(doc! { "_id": bson::oid::ObjectId::with_string(&id).unwrap() }), None)
+    let retrieved = coll.find_one(Some(doc! { "_id": bson::oid::ObjectId::with_string(&id).unwrap() }), None)
                     .expect("Document not found");
 
-    content::Json(format!("{:?}", gg))
+    Json(format!("got game with id: {:?}", retrieved))
 }
 
 #[delete("/games/<id>")]
-pub fn delete_game(conn: Mongoose, id: String) -> content::Json<String> {
+pub fn delete_game(conn: Mongoose, id: String) -> Json<String> {
     let coll = conn.collection("games");
 
     let filter = doc!{ "_id": bson::oid::ObjectId::with_string(&id).unwrap()};
 
     coll.delete_one(filter.clone(), None).unwrap();
 
-    content::Json(format!("{:?}", filter))
+    Json(format!("deleted game with id: {:?}", filter))
 }

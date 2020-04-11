@@ -3,14 +3,10 @@ use crate::game_elements::*;
 use std::collections::{HashSet, HashMap};
 
 use yew::prelude::*;
-use serde_json::json;
-use serde_json::ser;
-use yew::format::{Json, Nothing};
+use yew::format::Json;
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use yew::services::console::ConsoleService;
 use anyhow::Error;
-use bson::UtcDateTime;
-use chrono::{DateTime, Utc};
 use common::Game;
 
 pub struct TootOttoBoard {
@@ -305,7 +301,7 @@ impl TootOttoBoard {
                 };
 
                 self.winner = winner.to_string();
-                let mut log_winner = self.winner.clone();
+                let log_winner = self.winner.clone();
                 self.console.log(&log_winner);
                 self.game_over = true;
                 self.console.log("game over 1");
@@ -398,7 +394,7 @@ impl TootOttoBoard {
 impl State {
     fn post_game(&mut self, props: &Props, winner: &String) -> FetchTask {
         self.console.log("in post game");
-        let mut winner_str = || if winner.is_empty() {
+        let winner_str = || if winner.is_empty() {
             "Tie".to_string()
         } else {
             winner.clone()

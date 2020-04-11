@@ -6,14 +6,10 @@
 
 use std::io;
 use std::path::{Path, PathBuf};
-
 use rocket::response::NamedFile;
-// use bson::{Bson, doc, oid::ObjectId};
-// use mongodb::{options::ClientOptions, Client, error::Error};
+use rocket_contrib::databases::mongodb;
 
 pub mod routes;
-
-use rocket_contrib::databases::mongodb;
 
 #[database("mongoose")]
 pub struct Mongoose(mongodb::db::Database);
@@ -23,7 +19,6 @@ fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/index.html")
 }
 
-// TODO: look into ranks just in case it dies
 #[get("/<file..>", rank = 1)]
 fn files(file: PathBuf) -> Option<NamedFile> {
     NamedFile::open(Path::new("static/").join(file)).ok()
