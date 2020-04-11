@@ -422,19 +422,6 @@ impl State {
 
         self.console.log("now assigning callback");
 
-        // let callback = self.link.callback(
-        //     | response: Response<Result<String, Error>>| {
-        //         if response.status().is_success() {
-        //             // self.console.log("fetch succ");
-        //             Msg::Fetch
-        //         }
-        //         else {
-        //             // self.console.log("fetch not succ");
-        //             Msg::FetchFailed
-        //         }
-        //     },
-        // );
-
         let handler = move |_response: Response<Json<Result<String, Error>>>| {
             panic!("Failed to send request");
         };
