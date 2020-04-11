@@ -20,7 +20,6 @@ pub struct ConnectFourBoard {
     props: Props,
     board: HashMap<Coord, Token>,
     current_token: Token,
-    turn: Turn,
     game_over: bool,
     winner: String,
     ft: Option<FetchTask>,
@@ -67,7 +66,6 @@ impl Component for ConnectFourBoard {
             props: props.clone(),
             board: HashMap::new(),
             current_token: Token::R,
-            turn: Turn::First,
             game_over: false,
             winner: "".into(),
             ft: None, //Some(task),
@@ -90,10 +88,7 @@ impl Component for ConnectFourBoard {
             Msg::Clicked(row, col) => {
                 if !self.game_over {
                     match self.drop(col, self.current_token) {
-                        Ok(()) => {
-                            self.current_token.next();
-                            self.turn.next();
-                        },
+                        Ok(()) => self.current_token.next(),
                         Err(e) => self.console.log(format!("Err {}", e).as_ref())
                     }
                     
@@ -108,14 +103,10 @@ impl Component for ConnectFourBoard {
                             self.console.log(format!("col_bot: {}", col_bot).as_ref());
                             match self.drop(col_bot, Token::Y) {
                                 Ok(()) => {
-                                    self.current_token = Token::R;
-                                    self.turn.next();
+                                    self.current_token.next();
                                     break;
                                 },
-                                Err(e) => {
-                                    self.console.log(format!("Err {}", e).as_ref());
-                                    continue;
-                                },
+                                Err(e) => self.console.log(format!("Err {}", e).as_ref())
                             }
                         }
                     }
@@ -182,9 +173,9 @@ impl Component for ConnectFourBoard {
             }
         };
 
-        let turn = || match self.turn {
-            Turn::First => &self.props.player1_name,
-            Turn::Second => &self.props.player2_name
+        let turn = || match self.current_token {
+            Token::R => &self.props.player1_name,
+            Token::Y => &self.props.player2_name
         };
 
         let get_result = || if self.winner.is_empty() {
