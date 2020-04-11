@@ -2,7 +2,7 @@ use crate::game_elements::*;
 use crate::connect_four::*;
 
 use std::collections::HashMap;
-use std::cmp::max;
+use std::cmp::{max, min};
 
 use yew::services::console::ConsoleService;
 
@@ -30,9 +30,6 @@ impl Bot {
     pub fn get_move(&mut self, board: GameBoard, depth: isize) -> Dim {
         self.set_board(board);
         self.set_depth(depth);
-        self.console.log(format!("depth: {}", &self.depth).as_ref());
-        self.console.log(format!("-isize::max_value: {}", -isize::max_value()).as_ref());
-        self.console.log(format!("isize::max_value: {}", isize::max_value()).as_ref());
         let (_, col) = self.max_state(self.depth, -isize::max_value(), isize::max_value());
         col
     }
@@ -55,38 +52,38 @@ impl Bot {
     fn match_ai_token(&self, row: isize, col: isize) -> isize {
         if self.token_is_at((row, col), &self.token) { // AI is negative
             -1 // AI Token
-        } else if self.board.get(&(row, col)).is_none() {
+        } else if !self.token_is_at((row, col), &self.token) {
             0 // Blank space
         } else {
             1 // Player's Token
         }
     }
 
-    fn fill_map(&self, col: isize, token: Token) -> Option<GameBoard> {
-        let mut temp_map = self.board.clone();
+    // return true if was able to 
+    fn insert_in_col(&mut self, col: isize, token: Token) -> bool {
         let top_row = 5;
 
         // if top row is filled, or if col is invalid, can't modify column
-        if temp_map.get(&(top_row, col)).is_some() || col < 0 || col > 6 {
-            return None
+        if self.board.get(&(top_row, col)).is_some() || col < 0 || col > 6 {
+            return false;
         }
 
         // else, find next free row
         let mut row = -1;
         for i in 0..top_row {
-            if temp_map.get(&(row, col)).is_none() {
+            if self.board.get(&(i, col)).is_none() {
                 row = i;
                 break;
             }
         }
 
         if row < 0 {    // theoretically, should never get here
-            return None;
+            return false;
         }
         
         // insert in found row
-        temp_map.insert((row, col), token);
-        Some(temp_map)
+        self.board.insert((row, col), token);
+        true
     }
 
     fn check_state(&self) -> (isize, isize) {
@@ -94,17 +91,13 @@ impl Bot {
         let cols = 7; // 7, j
         let mut win_val = 0;
         let mut chain_val = 0;
-        let mut temp_r = 0;
-        let mut temp_b = 0;
-        let mut temp_br = 0;
-        let mut temp_tr = 0;
 
         for i in 0..rows {
             for j in 0..cols {
-                temp_r = 0;
-                temp_b = 0;
-                temp_br = 0;
-                temp_tr = 0;
+                let mut temp_r = 0;
+                let mut temp_t = 0;
+                let mut temp_tr = 0;
+                let mut temp_br = 0;
                 for k in 0..4 {
 
                     // from (i,j) to right
@@ -112,34 +105,34 @@ impl Bot {
                         temp_r += self.match_ai_token(i, j + k);
                     }
 
-                    // from (i,j) to bottom
+                    // from (i,j) to top
                     if i + k < rows {
-                        temp_b += self.match_ai_token(i + k, j);
-                    }
-
-                    // from (i,j) to bottom-right
-                    if i + k < rows && j + k < cols {
-                        temp_br += self.match_ai_token(i + k, j + k);
+                        temp_t += self.match_ai_token(i + k, j);
                     }
 
                     // from (i,j) to top-right
+                    if i + k < rows && j + k < cols {
+                        temp_tr += self.match_ai_token(i + k, j + k);
+                    }
+
+                    // from (i,j) to bottom-right
                     if i - k >= 0 && j + k < cols {
-                        temp_tr += self.match_ai_token(i - k, j + k);
+                        temp_br += self.match_ai_token(i - k, j + k);
                     }
                 }
                 chain_val += temp_r * temp_r * temp_r;
-                chain_val += temp_b * temp_b * temp_b;
-                chain_val += temp_br * temp_br * temp_br;
+                chain_val += temp_t * temp_t * temp_t;
                 chain_val += temp_tr * temp_tr * temp_tr;
+                chain_val += temp_br * temp_br * temp_br;
 
                 if temp_r.abs() == 4 {
                     win_val = temp_r;
-                } else if temp_b.abs() == 4 {
-                    win_val = temp_b;
-                } else if temp_br.abs() == 4 {
-                    win_val = temp_br;
+                } else if temp_t.abs() == 4 {
+                    win_val = temp_t;
                 } else if temp_tr.abs() == 4 {
                     win_val = temp_tr;
+                } else if temp_br.abs() == 4 {
+                    win_val = temp_br;
                 }
             }
         }
@@ -147,11 +140,12 @@ impl Bot {
         (win_val, chain_val)
     }
 
-    fn value(&self, depth: isize, alpha: isize, beta: isize) -> (isize, isize) {
-        let val = self.check_state();
+    fn value(&mut self, depth: isize, alpha: isize, beta: isize) -> (isize, isize) {
+        let (win_val, chain_val) = self.check_state();
+
+        // if slow (or memory consumption is high), lower the value
         if depth >= 4 {
-            let win_val = val.0;
-            let mut ret_value = val.1 * Bot::AI_MOVE_VALUE;
+            let mut ret_value = chain_val * Bot::AI_MOVE_VALUE;
 
             if win_val == 4 * Bot::AI_MOVE_VALUE {
                 ret_value = 999999;
@@ -163,12 +157,12 @@ impl Bot {
             return (ret_value, -1 as isize)
         }
 
-        let win = val.0;
-
-        if win == 4 * Bot::AI_MOVE_VALUE {
+        // AI won
+        if win_val == 4 * Bot::AI_MOVE_VALUE {
             return (999999 - depth * depth, -1 as isize)
         }
-        if win == 4 * Bot::AI_MOVE_VALUE * -1 {
+        // AI lost
+        if win_val == 4 * Bot::AI_MOVE_VALUE * -1 {
             return (-999999 - depth * depth, -1 as isize)
         }
 
@@ -189,26 +183,26 @@ impl Bot {
         choices[index % choices.len()].abs()
     }
 
-    fn max_state(&self, depth: isize, mut alpha: isize, beta: isize) -> (isize, isize) {
+    fn max_state(&mut self, depth: isize, mut alpha: isize, beta: isize) -> (isize, isize) {
         let mut v = -isize::max_value();
         let mut _move = -1;
-        let mut temp_val: (isize, isize);
         let mut move_queue = Vec::new();
 
+        // for each column
         for j in 0..7 {
-            let temp_state = self.fill_map(j, self.token);
-            if temp_state.is_some() {
-                temp_val = self.value(depth, alpha, beta);
-                if temp_val.0 > v {
-                    v = temp_val.0;
-                    _move = j;
+            let inserted = self.insert_in_col(j, self.token);
+            if inserted {
+                let (temp_val, _) = self.value(depth, alpha, beta);
+                if temp_val > v {
+                    v = temp_val;
+
+                    // restart queue cause this column is the best move?
                     move_queue.clear();
                     move_queue.push(j);
-                } else if temp_val.0 == v {
+                } else if temp_val == v {
                     move_queue.push(j);
                 }
-
-
+                
                 // alpha-beta pruning
                 if v > beta {
                     _move = self.choose(move_queue);
@@ -217,36 +211,38 @@ impl Bot {
                 alpha = max(alpha, v);
             }
         }
+
         _move = self.choose(move_queue);
         (v, _move)
     }
 
-    fn min_state(&self, depth: isize, alpha: isize, mut beta: isize) -> (isize, isize) {
+    fn min_state(&mut self, depth: isize, alpha: isize, mut beta: isize) -> (isize, isize) {
         let mut v = isize::max_value();
         let mut _move = -1;
-        let mut temp_val: (isize, isize);
         let mut move_queue = Vec::new();
 
+        // for each column
         for j in 0..7 {
-            let temp_state = self.fill_map(j, Token::R);
-            if temp_state.is_some() {
-                temp_val = self.value(depth, alpha, beta);
-                if temp_val.0 < v {
-                    v = temp_val.0;
+            let inserted = self.insert_in_col(j, Token::R);
+            if inserted {
+                let (temp_val, _) = self.value(depth, alpha, beta);
+                if temp_val < v {
+                    v = temp_val;
                     _move = j;
+
+                    // restart queue cause this column is the best move?
                     move_queue.clear();
                     move_queue.push(j);
-                } else if temp_val.0 == v {
+                } else if temp_val == v {
                     move_queue.push(j);
                 }
-
 
                 // alpha-beta pruning
                 if v < alpha {
                     _move = self.choose(move_queue);
                     return (v, _move);
                 }
-                beta = max(beta, v);
+                beta = min(beta, v);
             }
         }
         _move = self.choose(move_queue);
