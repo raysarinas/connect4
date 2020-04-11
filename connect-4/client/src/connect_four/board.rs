@@ -19,7 +19,6 @@ pub struct ConnectFourBoard {
     link: ComponentLink<Self>,
     props: Props,
     board: HashMap<Coord, Token>,
-    turn_map: HashMap<Coord, Turn>,
     current_token: Token,
     turn: Turn,
     game_over: bool,
@@ -65,9 +64,8 @@ impl Component for ConnectFourBoard {
 
         ConnectFourBoard {
             link,
-            props: props,
+            props: props.clone(),
             board: HashMap::new(),
-            turn_map: HashMap::new(),
             current_token: Token::R,
             turn: Turn::First,
             game_over: false,
@@ -75,7 +73,7 @@ impl Component for ConnectFourBoard {
             ft: None, //Some(task),
             state,
             console: ConsoleService::new(),
-            bot: Bot::new(Difficulty::Easy)
+            bot: Bot::new(props.difficulty)
         }
     }
 
@@ -90,36 +88,35 @@ impl Component for ConnectFourBoard {
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::Clicked(row, col) => {
-                self.console.log("clicked");
                 if !self.game_over {
-                    match self.drop(col, self.current_token, self.turn) {
+                    match self.drop(col, self.current_token) {
                         Ok(()) => {
-                            self.current_token = match self.current_token {
-                                Token::R => Token::Y,
-                                Token::Y => Token::R,
-                            };
+                            self.current_token.next();
                             self.turn.next();
                         },
-                        Err(e) => println!("Err: {}", e), // TODO: do something with this
+                        Err(e) => self.console.log(format!("Err {}", e).as_ref())
                     }
                     
+                    // AI stuff
                     if self.props.player2_name == "Computer" && !self.game_over {
-                        let depth = match self.props.difficulty {
-                            Difficulty::Easy => 3,
-                            Difficulty::Medium => 4,
-                            Difficulty::Hard => 50
-                        };
-                        let (_, col_bot) = self.bot.maxState(&self.board, depth, -isize::max_value(), isize::max_value());
+                        self.console.log("Computer turn");
                         
-                        match self.drop(col_bot, Token::Y, self.turn) {
-                            Ok(()) => {
-                                self.current_token = match self.current_token {
-                                    Token::R => Token::Y,
-                                    Token::Y => Token::R,
-                                };
-                                self.turn.next();
-                            },
-                            Err(e) => println!("Err: {}", e), // TODO: do something with this
+                        // choose a move until we get a valid column
+                        // column is valid only if it's not full
+                        loop {
+                            let col_bot = self.bot.get_move(&self.board);
+                            self.console.log(format!("col_bot: {}", col_bot).as_ref());
+                            match self.drop(col_bot, Token::Y) {
+                                Ok(()) => {
+                                    self.current_token = Token::R;
+                                    self.turn.next();
+                                    break;
+                                },
+                                Err(e) => {
+                                    self.console.log(format!("Err {}", e).as_ref());
+                                    continue;
+                                },
+                            }
                         }
                     }
                 }
@@ -143,21 +140,21 @@ impl Component for ConnectFourBoard {
     }
 
     fn view(&self) -> Html {
-        let draw_token = |r, c| match self.get_turn_at((r,c)) {
-            Some(turn) => {
-                match &turn {
-                    Turn::First => "R",
-                    Turn::Second => "Y"
+        let draw_token = |r, c| match self.get_token_at((r,c)) {
+            Some(token) => {
+                match &token {
+                    Token::R => "R",
+                    Token::Y => "Y"
                 }
             },
             None => ""
         };
 
-        let get_cell_color = |r, c| match self.get_turn_at((r,c)) {
+        let get_cell_color = |r, c| match self.get_token_at((r,c)) {
             Some(token) => {
                 match &token {
-                    Turn::First => "red",
-                    Turn::Second => "bright_yellow"
+                    Token::R => "red",
+                    Token::Y => "bright_yellow"
                 }
             },
             None => ""
@@ -219,10 +216,10 @@ impl Component for ConnectFourBoard {
 
 impl ConnectFourBoard {
     // Bottom left is 0, 0
-    fn drop(&mut self, col: Dim, token: Token, turn: Turn) -> Result<(), &'static str> {
+    fn drop(&mut self, col: Dim, token: Token) -> Result<(), &'static str> {
         match self.next_free_row(col) {
             Some(row) => {
-                self.put_token_at((row, col), token, turn);
+                self.put_token_at((row, col), token);
                 self.check();
                 Ok(())
             }
@@ -240,18 +237,13 @@ impl ConnectFourBoard {
 
     // set the token at a given location on the board
     // assert that there were no tokens there before
-    fn put_token_at(&mut self, coord: Coord, token: Token, turn: Turn) {
+    fn put_token_at(&mut self, coord: Coord, token: Token) {
         self.board.insert(coord, token);
-        self.turn_map.insert(coord, turn);
     }
 
     // Get the token at a given location on the board
     fn get_token_at(&self, coord: Coord) -> Option<&Token> {
         self.board.get(&coord)
-    }
-
-    fn get_turn_at(&self, coord: Coord) -> Option<&Turn> {
-        self.turn_map.get(&coord)
     }
 
     // Given a col, check the next free row

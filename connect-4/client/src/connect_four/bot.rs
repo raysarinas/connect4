@@ -10,7 +10,7 @@ use std::cmp::max;
 
 pub struct Bot {
     token: Token,
-    difficulty: Difficulty,
+    depth: isize,
     board: GameBoard,
 }
 
@@ -20,11 +20,22 @@ impl Bot {
     const aiMoveValue: isize = -1;
 
     pub fn new(difficulty: Difficulty) -> Self {
+        let depth = match difficulty {
+            Difficulty::Easy => 3,
+            Difficulty::Medium => 4,
+            Difficulty::Hard => 50
+        };
+
         Self {
             token: Token::Y,
-            difficulty: difficulty,
+            depth: depth,
             board: HashMap::new(),
         }
+    }
+
+    pub fn get_move(&self, board: &GameBoard) -> isize {
+        let (_, col) = self.maxState(board, self.depth, -isize::max_value(), isize::max_value());
+        col
     }
 
     fn matchAIToken(&self, board: &GameBoard, row: isize, col: isize) -> isize {
