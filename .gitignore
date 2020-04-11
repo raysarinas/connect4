@@ -7,3 +7,4 @@ connect-4/server/static/client.js
 connect-4/server/static/client.wasm
 connect-4/server/static/index.html
 connect-4/client/Cargo.lock
+connect-4/client/src/toot_otto/boardMERGE.rs
