@@ -1,4 +1,5 @@
 use crate::game_elements::*;
+use crate::connect_four::bot::Bot;
 
 use std::collections::{HashSet, HashMap};
 
@@ -24,6 +25,7 @@ pub struct ConnectFourBoard {
     ft: Option<FetchTask>,
     state: State,
     console: ConsoleService,
+    bot: Bot,
 }
 
 pub struct State {
@@ -65,7 +67,7 @@ impl Component for ConnectFourBoard {
             console: ConsoleService::new(),
         };
 
-        ConnectFourBoard {
+            ConnectFourBoard {
             link,
             props: props,
             board: HashMap::new(),
@@ -76,6 +78,7 @@ impl Component for ConnectFourBoard {
             ft: None, //Some(task),
             state,
             console: ConsoleService::new(),
+            bot: Bot::new(Difficulty::Easy)
         }
     }
 
@@ -102,7 +105,7 @@ impl Component for ConnectFourBoard {
                         },
                         Err(e) => println!("Err: {}", e), // TODO: do something with this
                     }
-
+                    
                     // if self.props.player2_name == "Computer", make ai move here i guess
                 }
             },
