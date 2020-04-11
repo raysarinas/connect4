@@ -17,3 +17,4 @@ bson = "0.14.1"
 chrono = "*"
 common = { path = "../common" }
 rand = "0.7.3"
+getrandom = "0.1.14"

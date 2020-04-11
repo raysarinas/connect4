@@ -1,4 +1,5 @@
 use crate::game_elements::*;
+use crate::connect_four::*;
 use crate::connect_four::bot::Bot;
 
 use std::collections::{HashSet, HashMap};
@@ -33,12 +34,6 @@ pub struct State {
     fetching: bool,
     json_value: Option<Game>,
     console: ConsoleService,
-}
-
-#[derive(Clone, PartialEq, Hash, Eq, Copy)]
-pub enum Token {
-    R,
-    Y
 }
 
 pub enum Msg {
@@ -106,7 +101,19 @@ impl Component for ConnectFourBoard {
                         Err(e) => println!("Err: {}", e), // TODO: do something with this
                     }
                     
-                    // if self.props.player2_name == "Computer", make ai move here i guess
+                    if self.props.player2_name == "Computer" {
+                        let test = match self.props.difficulty {
+                            Difficulty::Easy => 1,
+                            Difficulty::Medium => 2,
+                            Difficulty::Hard => 3
+                        };
+                        let (_, col_bot) = self.bot.maxState(&self.board, test, -isize::max_value(), isize::max_value());
+                        
+                        match self.drop(col_bot, Token::Y) {
+                            Ok(()) => self.turn.next(),
+                            Err(e) => println!("Err: {}", e), // TODO: do something with this
+                        }
+                    }
                 }
             },
             Msg::Fetch => {

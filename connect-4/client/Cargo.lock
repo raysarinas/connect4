@@ -145,6 +145,7 @@ dependencies = [
  "chrono",
  "common",
  "failure",
+ "getrandom",
  "rand",
  "serde",
  "serde_json",

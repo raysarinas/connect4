@@ -1,6 +1,8 @@
 use std::collections::{HashSet, HashMap};
 use crate::game_elements::*;
-extern crate rand;
+use crate::connect_four::*;
+
+extern crate getrandom;
 
 use rand::Rng;
 use std::cmp::max;
@@ -18,12 +20,6 @@ pub struct Bot {
 // }
 
 pub type GameBoard = HashMap<Coord, Token>;
-
-#[derive(Clone, PartialEq, Hash, Eq, Copy)]
-pub enum Token {
-    R,
-    Y
-}
 
 impl Bot {
     const aiMoveValue: isize = -1;
@@ -181,10 +177,15 @@ impl Bot {
 
     fn choose(choices: Vec<isize>) -> isize {
         let mut rng = rand::thread_rng();
-        choices[rng.gen_range(0, choices.len())]
+        let yes: usize = rng.gen_range(0, choices.len());
+        choices[yes]
+        
+        // let buf = [usize; choices.len()];
+        // let num = getrandom::getrandom(&mut buf).unwrap();
+        // choices[num]
     }
 
-    fn maxState(&self, board: &GameBoard, depth: isize, mut alpha: isize, mut beta: isize) -> (isize, isize) {
+    pub fn maxState(&self, board: &GameBoard, depth: isize, mut alpha: isize, mut beta: isize) -> (isize, isize) {
         let mut v = -isize::max_value();
         let mut _move = -1;
         let mut tempVal: (isize, isize);
@@ -207,7 +208,7 @@ impl Bot {
                 // alpha-beta pruning
                 if v > beta {
                     _move = Self::choose(moveQueue);
-                    return (v, _move);
+                    return (v, _move); // (value, col)
                 }
                 alpha = max(alpha, v);
             }
