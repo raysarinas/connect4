@@ -3,6 +3,7 @@ use crate::game_elements::*;
 use crate::connect_four::*;
 
 extern crate getrandom;
+extern crate rand;
 
 use rand::Rng;
 use std::cmp::max;
@@ -176,13 +177,22 @@ impl Bot {
     }
 
     fn choose(choices: Vec<isize>) -> isize {
-        let mut rng = rand::thread_rng();
-        let yes: usize = rng.gen_range(0, choices.len());
-        choices[yes]
-        
-        // let buf = [usize; choices.len()];
-        // let num = getrandom::getrandom(&mut buf).unwrap();
+        // let mut rng = rand::thread_rng();
+        // let yes: usize = rng.gen();
+        // choices[yes]
+        // unsafe {
+        //     let mut buf = [0u8; 1];
+        //     getrandom::getrandom(&mut buf).unwrap();
+        // }
+        // choices[(buf[0] % choices.len() as u8) as usize]
         // choices[num]
+        let dumb = vec![2];
+        let addr = &dumb as *const Vec<i32>;
+        let index = addr as usize;
+        if choices.len() == 0 {
+            return ((index % 7) as isize).abs()
+        }
+        choices[index % choices.len()].abs()
     }
 
     pub fn maxState(&self, board: &GameBoard, depth: isize, mut alpha: isize, mut beta: isize) -> (isize, isize) {

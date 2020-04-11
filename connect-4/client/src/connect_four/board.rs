@@ -102,12 +102,12 @@ impl Component for ConnectFourBoard {
                     }
                     
                     if self.props.player2_name == "Computer" {
-                        let test = match self.props.difficulty {
-                            Difficulty::Easy => 1,
-                            Difficulty::Medium => 2,
-                            Difficulty::Hard => 3
+                        let depth = match self.props.difficulty {
+                            Difficulty::Easy => 3,
+                            Difficulty::Medium => 4,
+                            Difficulty::Hard => 50
                         };
-                        let (_, col_bot) = self.bot.maxState(&self.board, test, -isize::max_value(), isize::max_value());
+                        let (_, col_bot) = self.bot.maxState(&self.board, depth, -isize::max_value(), isize::max_value());
                         
                         match self.drop(col_bot, Token::Y) {
                             Ok(()) => self.turn.next(),
