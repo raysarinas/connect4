@@ -31,6 +31,8 @@ impl Bot {
         self.set_board(board);
         self.set_depth(depth);
         self.console.log(format!("depth: {}", &self.depth).as_ref());
+        self.console.log(format!("-isize::max_value: {}", -isize::max_value()).as_ref());
+        self.console.log(format!("isize::max_value: {}", isize::max_value()).as_ref());
         let (_, col) = self.max_state(self.depth, -isize::max_value(), isize::max_value());
         col
     }
@@ -60,27 +62,30 @@ impl Bot {
         }
     }
 
-    fn fill_map(&self, col: isize, value: isize) -> Option<GameBoard> {
+    fn fill_map(&self, col: isize, token: Token) -> Option<GameBoard> {
         let mut temp_map = self.board.clone();
-        if temp_map.get(&(0, col)).is_some() || col < 0 || col > 6 {
+        let top_row = 5;
+
+        // if top row is filled, or if col is invalid, can't modify column
+        if temp_map.get(&(top_row, col)).is_some() || col < 0 || col > 6 {
             return None
         }
 
-        let mut done = false;
-        let mut row = 0;
-
-        for i in 0..5 {
-            if temp_map.get(&(i + 1, col)).is_some() {
-                done = true;
+        // else, find next free row
+        let mut row = -1;
+        for i in 0..top_row {
+            if temp_map.get(&(row, col)).is_none() {
                 row = i;
                 break;
             }
         }
 
-        if !done {
-            row = 5;
+        if row < 0 {    // theoretically, should never get here
+            return None;
         }
-        temp_map.insert((row, col), self.token);
+        
+        // insert in found row
+        temp_map.insert((row, col), token);
         Some(temp_map)
     }
 
@@ -191,7 +196,7 @@ impl Bot {
         let mut move_queue = Vec::new();
 
         for j in 0..7 {
-            let temp_state = self.fill_map(j, Bot::AI_MOVE_VALUE);
+            let temp_state = self.fill_map(j, self.token);
             if temp_state.is_some() {
                 temp_val = self.value(depth, alpha, beta);
                 if temp_val.0 > v {
@@ -223,7 +228,7 @@ impl Bot {
         let mut move_queue = Vec::new();
 
         for j in 0..7 {
-            let temp_state = self.fill_map(j, Bot::AI_MOVE_VALUE * -1);
+            let temp_state = self.fill_map(j, Token::R);
             if temp_state.is_some() {
                 temp_val = self.value(depth, alpha, beta);
                 if temp_val.0 < v {
