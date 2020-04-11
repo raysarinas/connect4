@@ -2,13 +2,12 @@ use crate::rocket_contrib;
 use crate::rocket_contrib::databases::mongodb::db::ThreadedDatabase;
 use crate::Mongoose;
 
-use rocket_contrib::{databases::mongodb};
-use rocket_contrib::json::Json;
+use rocket_contrib::{databases::mongodb, json::Json};
 use mongodb::{doc, bson};
 use serde_json::ser;
 use bson::Bson;
 use chrono::prelude::*;
-use common::{Game};
+use common::Game;
 
 #[get("/games")]
 pub fn get_all_games(conn: Mongoose) -> Json<Vec<String>> {
