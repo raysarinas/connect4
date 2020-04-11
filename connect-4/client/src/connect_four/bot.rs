@@ -12,13 +12,7 @@ pub struct Bot {
     token: Token,
     difficulty: Difficulty,
     board: GameBoard,
-    // state: State, // maybe remove
 }
-
-// pub struct State { // maybe remove
-//     winVal: isize,
-//     chainVal: isize,
-// }
 
 pub type GameBoard = HashMap<Coord, Token>;
 
@@ -30,16 +24,8 @@ impl Bot {
             token: Token::Y,
             difficulty: difficulty,
             board: HashMap::new(),
-            // state: State {
-            //     winVal: 0,
-            //     chainVal: 0,
-            // }
         }
     }
-
-    // pub fn set_board(board: &GameBoard) {
-    //     self.board = board;
-    // }
 
     fn matchAIToken(&self, board: &GameBoard, row: isize, col: isize) -> isize {
         let tempBoard = board.clone();
@@ -100,7 +86,7 @@ impl Bot {
                 temp_b = 0;
                 temp_br = 0;
                 temp_tr = 0;
-                for k in 0..3 {
+                for k in 0..4 {
 
                     // from (i,j) to right
                     if j + k < cols {
@@ -177,17 +163,8 @@ impl Bot {
     }
 
     fn choose(choices: Vec<isize>) -> isize {
-        // let mut rng = rand::thread_rng();
-        // let yes: usize = rng.gen();
-        // choices[yes]
-        // unsafe {
-        //     let mut buf = [0u8; 1];
-        //     getrandom::getrandom(&mut buf).unwrap();
-        // }
-        // choices[(buf[0] % choices.len() as u8) as usize]
-        // choices[num]
-        let dumb = vec![2];
-        let addr = &dumb as *const Vec<i32>;
+        let temp = vec![2];
+        let addr = &temp as *const Vec<i32>;
         let index = addr as usize;
         if choices.len() == 0 {
             return ((index % 7) as isize).abs()
