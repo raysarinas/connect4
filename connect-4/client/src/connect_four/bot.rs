@@ -1,20 +1,16 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::HashMap;
 use crate::game_elements::*;
 use crate::connect_four::*;
 
-extern crate getrandom;
-extern crate rand;
-
-use rand::Rng;
 use std::cmp::max;
+
+pub type GameBoard = HashMap<Coord, Token>;
 
 pub struct Bot {
     token: Token,
     depth: isize,
     board: GameBoard,
 }
-
-pub type GameBoard = HashMap<Coord, Token>;
 
 impl Bot {
     const aiMoveValue: isize = -1;
@@ -26,38 +22,42 @@ impl Bot {
             Difficulty::Hard => 50
         };
 
-        Self {
+        Bot {
             token: Token::Y,
             depth: depth,
             board: HashMap::new(),
         }
     }
 
-    pub fn get_move(&self, board: &GameBoard) -> isize {
-        let (_, col) = self.maxState(board, self.depth, -isize::max_value(), isize::max_value());
+    pub fn get_move(&mut self, board: GameBoard) -> Dim {
+        self.set_board(board);
+        let (_, col) = self.maxState(self.depth, -isize::max_value(), isize::max_value());
         col
     }
 
-    fn matchAIToken(&self, board: &GameBoard, row: isize, col: isize) -> isize {
-        let tempBoard = board.clone();
-        if Self::token_is_at(&tempBoard, (row, col), &self.token) { // AI is negative
+    fn set_board(&mut self, board: GameBoard) {
+        self.board = board;
+    }
+
+    fn token_is_at(&self, coord: Coord, expected: &Token) -> bool {
+        match self.board.get(&coord) {
+            Some(actual) => expected == actual,
+            None => false,
+        }
+    }
+
+    fn matchAIToken(&self, row: isize, col: isize) -> isize {
+        if self.token_is_at((row, col), &self.token) { // AI is negative
             -1 // AI Token
-        } else if board.get(&(row, col)).is_none() {
+        } else if self.board.get(&(row, col)).is_none() {
             0 // Blank space
         } else {
             1 // Player's Token
         }
     }
 
-    fn token_is_at(board: &GameBoard, coord: Coord, expected: &Token) -> bool {
-        match board.get(&coord) {
-            Some(actual) => expected == actual,
-            None => false,
-        }
-    }
-
-    fn fillMap(&self, state: &GameBoard, col: isize, value: isize) -> Option<GameBoard> {
-        let mut tempMap = state.clone();
+    fn fillMap(&self, col: isize, value: isize) -> Option<GameBoard> {
+        let mut tempMap = self.board.clone();
         if tempMap.get(&(0, col)).is_some() || col < 0 || col > 6 {
             return None
         }
@@ -80,8 +80,7 @@ impl Bot {
         Some(tempMap)
     }
 
-    fn checkState(&self, state: &GameBoard) -> (isize, isize) {
-        let board = state.clone();
+    fn checkState(&self) -> (isize, isize) {
         let rows = 6; // 6, i
         let cols = 7; // 7, j
         let mut winVal = 0;
@@ -101,22 +100,22 @@ impl Bot {
 
                     // from (i,j) to right
                     if j + k < cols {
-                        temp_r += self.matchAIToken(&board, i, j + k);
+                        temp_r += self.matchAIToken(i, j + k);
                     }
 
                     // from (i,j) to bottom
                     if i + k < rows {
-                        temp_b += self.matchAIToken(&board, i + k, j);
+                        temp_b += self.matchAIToken(i + k, j);
                     }
 
                     // from (i,j) to bottom-right
                     if i + k < rows && j + k < cols {
-                        temp_br += self.matchAIToken(&board, i + k, j + k);
+                        temp_br += self.matchAIToken(i + k, j + k);
                     }
 
                     // from (i,j) to top-right
                     if i - k >= 0 && j + k < cols {
-                        temp_tr += self.matchAIToken(&board, i - k, j + k);
+                        temp_tr += self.matchAIToken(i - k, j + k);
                     }
                 }
                 chainVal += temp_r * temp_r * temp_r;
@@ -139,8 +138,8 @@ impl Bot {
         (winVal, chainVal)
     }
 
-    fn value(&self, board: &GameBoard, depth: isize, alpha: isize, beta: isize) -> (isize, isize) {
-        let val = self.checkState(board);
+    fn value(&self, depth: isize, alpha: isize, beta: isize) -> (isize, isize) {
+        let val = self.checkState();
         if depth >= 4 {
             let mut retValue = 0;
             let winVal = val.0;
@@ -167,13 +166,13 @@ impl Bot {
         }
 
         if depth % 2 == 0 {
-            return self.minState(&board, depth + 1, alpha, beta);
+            return self.minState(depth + 1, alpha, beta);
         }
 
-        self.maxState(&board, depth + 1, alpha, beta)
+        self.maxState(depth + 1, alpha, beta)
     }
 
-    fn choose(choices: Vec<isize>) -> isize {
+    fn choose(&self, choices: Vec<isize>) -> Dim {
         let temp = vec![2];
         let addr = &temp as *const Vec<i32>;
         let index = addr as usize;
@@ -183,16 +182,16 @@ impl Bot {
         choices[index % choices.len()].abs()
     }
 
-    pub fn maxState(&self, board: &GameBoard, depth: isize, mut alpha: isize, mut beta: isize) -> (isize, isize) {
+    fn maxState(&self, depth: isize, mut alpha: isize, mut beta: isize) -> (isize, isize) {
         let mut v = -isize::max_value();
         let mut _move = -1;
         let mut tempVal: (isize, isize);
         let mut moveQueue = Vec::new();
 
         for j in 0..7 {
-            let mut tempState = self.fillMap(&board, j, Bot::aiMoveValue);
+            let mut tempState = self.fillMap(j, Bot::aiMoveValue);
             if tempState.is_some() {
-                tempVal = self.value(&tempState.unwrap(), depth, alpha, beta);
+                tempVal = self.value(depth, alpha, beta);
                 if tempVal.0 > v {
                     v = tempVal.0;
                     _move = j;
@@ -205,26 +204,26 @@ impl Bot {
 
                 // alpha-beta pruning
                 if v > beta {
-                    _move = Self::choose(moveQueue);
+                    _move = self.choose(moveQueue);
                     return (v, _move); // (value, col)
                 }
                 alpha = max(alpha, v);
             }
         }
-        _move = Self::choose(moveQueue);
+        _move = self.choose(moveQueue);
         (v, _move)
     }
 
-    fn minState(&self, board: &GameBoard, depth: isize, mut alpha: isize, mut beta: isize) -> (isize, isize) {
+    fn minState(&self, depth: isize, mut alpha: isize, mut beta: isize) -> (isize, isize) {
         let mut v = isize::max_value();
         let mut _move = -1;
         let mut tempVal: (isize, isize);
         let mut moveQueue = Vec::new();
 
         for j in 0..7 {
-            let mut tempState = self.fillMap(&board, j, Bot::aiMoveValue * -1);
+            let mut tempState = self.fillMap(j, Bot::aiMoveValue * -1);
             if tempState.is_some() {
-                tempVal = self.value(&tempState.unwrap(), depth, alpha, beta);
+                tempVal = self.value(depth, alpha, beta);
                 if tempVal.0 < v {
                     v = tempVal.0;
                     _move = j;
@@ -237,13 +236,13 @@ impl Bot {
 
                 // alpha-beta pruning
                 if v < alpha {
-                    _move = Self::choose(moveQueue);
+                    _move = self.choose(moveQueue);
                     return (v, _move);
                 }
                 beta = max(beta, v);
             }
         }
-        _move = Self::choose(moveQueue);
+        _move = self.choose(moveQueue);
         (v, _move)
     }
 }

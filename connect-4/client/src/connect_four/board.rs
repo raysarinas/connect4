@@ -99,7 +99,7 @@ impl Component for ConnectFourBoard {
                         // choose a move until we get a valid column
                         // column is valid only if it's not full
                         loop {
-                            let col_bot = self.bot.get_move(&self.board);
+                            let col_bot = self.bot.get_move(self.board.clone());
                             self.console.log(format!("col_bot: {}", col_bot).as_ref());
                             match self.drop(col_bot, Token::Y) {
                                 Ok(()) => {
