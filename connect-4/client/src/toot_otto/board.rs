@@ -7,6 +7,7 @@ use serde_json::json;
 use serde_json::ser;
 use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
+use yew::services::console::ConsoleService;
 use anyhow::Error;
 use bson::UtcDateTime;
 use chrono::{DateTime, Utc};
@@ -23,12 +24,14 @@ pub struct TootOttoBoard {
     winner: String,
     ft: Option<FetchTask>,
     state: State,
+    console: ConsoleService,
 }
 
 pub struct State {
     link: ComponentLink<TootOttoBoard>,
     fetching: bool,
-    json_value: Option<Game>,
+    json_value: Option<String>,
+    console: ConsoleService,
 }
 
 #[derive(Clone, PartialEq, Hash, Eq, Copy)]
@@ -61,6 +64,7 @@ impl Component for TootOttoBoard {
             link: link.clone(),
             fetching: true,
             json_value: None,
+            console: ConsoleService::new(),
         };
 
         TootOttoBoard {
@@ -71,9 +75,10 @@ impl Component for TootOttoBoard {
             selected_token: Token::T,
             turn: Turn::First,
             game_over: false,
-            winner: "".into(),
+            winner: "Tie".to_string(),
             ft: None, //Some(task),
             state,
+            console: ConsoleService::new(),
         }
     }
 
@@ -87,25 +92,37 @@ impl Component for TootOttoBoard {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::GotToken(token) => self.selected_token = token,
+            Msg::GotToken(token) => {
+                self.console.log("got token");
+                if !self.game_over {
+                    self.console.log("selected token assigned");
+                    self.selected_token = token
+                    
+                }
+            },
             Msg::Clicked(row, col) => {
                 if !self.game_over {
+                    self.console.log("clicked");
                     match self.drop(col, self.selected_token, self.turn) {
                         Ok(()) => self.turn.next(),
                         Err(e) => println!("Err: {}", e), // TODO: do something with this
                     }
-                    // if self.player2_name == "Computer", make ai move here i guess
+
+                    // if self.props.player2_name == "Computer", make ai move here i guess
                 }
             },
             Msg::Fetch => {
+                self.console.log("fetching");
                 let task = self.state.post_game(&self.props, &self.winner);
                 self.ft = Some(task);
             },
             Msg::FetchComplete(body) => {
+                self.console.log("fetch completed");
                 self.state.fetching = false;
-                // self.state.json_value = body.map(|data| data).ok();
+                self.state.json_value = body.map(|data| data).ok();
             },
             Msg::FetchFailed => {
+                self.console.log("fetch failed");
                 self.state.json_value = None;
                 return false;
             }
@@ -160,7 +177,7 @@ impl Component for TootOttoBoard {
             Turn::Second => &self.props.player2_name
         };
 
-        let get_result = || if self.winner.is_empty() {
+        let get_result = || if self.winner == "Tie" {
             html! { <h1><b>{"It's a draw"}</b></h1> }
         } else {
             html! { <h1><b>{&self.winner}{" wins"}</b></h1> }
@@ -191,7 +208,6 @@ impl Component for TootOttoBoard {
                 </div>
                 <div hidden=!self.game_over>
                     {get_result()}
-                    // <h1><b>{"Winner: "}{format!("{}", &self.winner)}</b></h1>
                 </div>
                 <table class="board">
                     {row(3)}
@@ -269,15 +285,19 @@ impl TootOttoBoard {
     }
 
     fn check(&mut self) {
+        self.console.log("checking winner");
         let winners = self.find_winners();
 
         match winners.len() {
             2 => {
+                // self.console.log("winner len = 2");
+                self.winner = "Tie".to_string();
                 self.game_over = true;
-                self.post_game();
+                self.console.log("game over 2");
                 return;
             }
             1 => {
+                // self.console.log("winner len = 1");
                 let winner = if winners.contains(&Token::T) {
                     &self.props.player1_name
                 } else {
@@ -285,7 +305,11 @@ impl TootOttoBoard {
                 };
 
                 self.winner = winner.to_string();
+                let mut log_winner = self.winner.clone();
+                self.console.log(&log_winner);
                 self.game_over = true;
+                self.console.log("game over 1");
+                // self.update(Msg::Fetch);
                 self.post_game();
                 return;
             }
@@ -293,14 +317,16 @@ impl TootOttoBoard {
         };
 
         if self.is_full() {
-            // self.winner = "Tie".to_string();
+            self.winner = "Tie".to_string();
             self.game_over = true;
             self.post_game();
         }
     }
 
     fn post_game(&mut self) {
+        self.console.log("calling post game");
         self.state.post_game(&self.props, &self.winner);
+        // self.update(Msg::Fetch);
     }
 
     fn find_winners(&self) -> HashSet<&Token> {
@@ -371,11 +397,14 @@ impl TootOttoBoard {
 
 impl State {
     fn post_game(&mut self, props: &Props, winner: &String) -> FetchTask {
+        self.console.log("in post game");
         let mut winner_str = || if winner.is_empty() {
             "Tie".to_string()
         } else {
             winner.clone()
         };
+
+        self.console.log(&winner_str());
 
         let new_game = Game {
             gameNumber: "1".to_string(),
@@ -386,20 +415,30 @@ impl State {
             GameDate: "".to_string(),
         };
 
+        self.console.log("new game made, calling post req");
         let post_request = Request::post("/games")
             .body(Json(&new_game))
             .expect("Failed to build request");
 
-        let callback = self.link.callback(
-            | response: Response<Result<String, Error>>| {
-                if response.status().is_success() {
-                    Msg::Fetch
-                }
-                else {
-                    Msg::FetchFailed
-                }
-            },
-        );
-        FetchService::new().fetch(post_request, callback).unwrap()
+        self.console.log("now assigning callback");
+
+        // let callback = self.link.callback(
+        //     | response: Response<Result<String, Error>>| {
+        //         if response.status().is_success() {
+        //             // self.console.log("fetch succ");
+        //             Msg::Fetch
+        //         }
+        //         else {
+        //             // self.console.log("fetch not succ");
+        //             Msg::FetchFailed
+        //         }
+        //     },
+        // );
+
+        let handler = move |_response: Response<Json<Result<String, Error>>>| {
+            panic!("Failed to send request");
+        };
+
+        FetchService::new().fetch(post_request, handler.into()).unwrap()
     }
 }
