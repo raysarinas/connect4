@@ -5,7 +5,7 @@ use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use anyhow::Error;
 use bson::UtcDateTime;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Utc, NaiveDateTime};
 use std::collections::HashMap;
 use common::{Game};
 
@@ -67,10 +67,15 @@ impl Component for GameHistory {
     
     // VIEW
     fn view(&self) -> Html {
-        // let parse_date = |date: String| {
-        //     let ms: i64 = date.parse::<i64>();
-        //     let stamp = Utc.timestamp(1_500_000_000, 0);
-        // }
+        let parse_date = |date: String| {
+            let ms: i64 = date.parse::<i64>().unwrap();
+            let seconds = (ms / 1000) as i64;
+            let nanos = ((ms % 1000) * 1_000_000) as u32;
+            let naive_datetime = NaiveDateTime::from_timestamp(seconds, nanos);
+            let stamp: DateTime<Utc> = DateTime::from_utc(naive_datetime, Utc);
+            stamp.format("%H:%M on %b %e, %Y").to_string()
+        };
+
         let row = |(index, g): (usize, &Game)| {
             html! {
                 <tr>
@@ -79,7 +84,7 @@ impl Component for GameHistory {
                     <td>{g.Player1Name.clone()}</td>
                     <td>{g.Player2Name.clone()}</td>
                     <td>{g.WinnerName.clone()}</td>
-                    <td>{g.GameDate.clone()}</td>
+                    <td>{parse_date(g.GameDate.clone())}</td>
                 </tr>
             }
         };

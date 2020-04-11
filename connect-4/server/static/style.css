@@ -47,3 +47,37 @@ a {
     text-decoration: none;
     display: block;
 }
+
+.board {
+	background: #00bfff;
+	border: 5px solid #00bfff;
+}
+
+.board_column {
+	height: 60px;
+	width: 60px;
+	background: #fff;
+	border: 5px solid #00bfff;
+	border-radius: 50%;
+	text-align: center;
+}
+
+.board_column:hover {
+	opacity: 0.4;
+}
+
+.red {
+	background: #ff4136;
+}
+
+.bright_yellow {
+	background: #ffff00;
+}
+
+.green {
+	background: #99ffcc;
+}
+
+.yellow {
+	background: #ffff99;
+}

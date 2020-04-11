@@ -579,6 +579,9 @@ Module.STDWEB_PRIVATE.acquire_tmp = function( dummy ) {
             "__cargo_web_snippet_0f503de1d61309643e0e13a7871406891e3691c9": function($0) {
                 Module.STDWEB_PRIVATE.from_js($0, (function(){return window;})());
             },
+            "__cargo_web_snippet_199d5eb25dfe761687bcd487578eb7e636bd9650": function($0) {
+                $0 = Module.STDWEB_PRIVATE.to_js($0);console.log(($0));
+            },
             "__cargo_web_snippet_1edaec034bdcb0a749c6d5de76c29f6371afb5a0": function($0) {
                 var o = Module.STDWEB_PRIVATE.acquire_js_reference( $0 );return (o instanceof Event && o.type === "input");
             },
