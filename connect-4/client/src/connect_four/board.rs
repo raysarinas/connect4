@@ -11,6 +11,7 @@ use anyhow::Error;
 use bson::UtcDateTime;
 use chrono::{DateTime, Utc};
 use common::Game;
+use yew::services::console::ConsoleService;
 
 pub struct ConnectFourBoard {
     link: ComponentLink<Self>,
@@ -22,12 +23,14 @@ pub struct ConnectFourBoard {
     winner: String,
     ft: Option<FetchTask>,
     state: State,
+    console: ConsoleService,
 }
 
 pub struct State {
     link: ComponentLink<ConnectFourBoard>,
     fetching: bool,
     json_value: Option<Game>,
+    console: ConsoleService,
 }
 
 #[derive(Clone, PartialEq, Hash, Eq, Copy)]
@@ -59,6 +62,7 @@ impl Component for ConnectFourBoard {
             link: link.clone(),
             fetching: true,
             json_value: None,
+            console: ConsoleService::new(),
         };
 
         ConnectFourBoard {
@@ -71,6 +75,7 @@ impl Component for ConnectFourBoard {
             winner: "".into(),
             ft: None, //Some(task),
             state,
+            console: ConsoleService::new(),
         }
     }
 
@@ -85,6 +90,7 @@ impl Component for ConnectFourBoard {
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::Clicked(row, col) => {
+                self.console.log("clicked");
                 if !self.game_over {
                     match self.drop(col, self.current_token) {
                         Ok(()) => {
@@ -101,10 +107,12 @@ impl Component for ConnectFourBoard {
                 }
             },
             Msg::Fetch => {
+                self.console.log("fetching");
                 let task = self.state.post_game(&self.props, &self.winner);
                 self.ft = Some(task);
             },
             Msg::FetchComplete(body) => {
+                self.console.log("fetching done");
                 self.state.fetching = false;
                 // self.state.json_value = body.map(|data| data).ok();
             },
@@ -249,6 +257,7 @@ impl ConnectFourBoard {
     }
 
     fn check(&mut self) {
+        self.console.log("CHECKING");
         let mut winner_token = self.find_winner();
 
         if let Some(token) = winner_token {
@@ -260,12 +269,14 @@ impl ConnectFourBoard {
 
             self.winner = winner.to_string();
             self.game_over = true;
+            self.console.log("game over");
             self.post_game();
+            return;
         }
 
         if self.is_full() {
             self.game_over = true;
-            // TODO: handle tie here?
+            self.post_game();
         }
     }
 
@@ -333,6 +344,7 @@ impl ConnectFourBoard {
 
 impl State {
     fn post_game(&mut self, props: &Props, winner: &String) -> FetchTask {
+        self.console.log("posting game");
         let mut winner_str = || if winner.is_empty() {
             "Tie".to_string()
         } else {
@@ -362,6 +374,7 @@ impl State {
                 }
             },
         );
+        self.console.log("returning fetch task");
         FetchService::new().fetch(post_request, callback).unwrap()
     }
 }
