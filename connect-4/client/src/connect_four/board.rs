@@ -2,7 +2,7 @@ use crate::game_elements::*;
 use crate::connect_four::*;
 use crate::connect_four::bot::Bot;
 
-use std::collections::{HashSet, HashMap};
+use std::collections::HashMap;
 
 use yew::prelude::*;
 use serde_json::json;
@@ -36,7 +36,7 @@ pub struct State {
 }
 
 pub enum Msg {
-    Clicked(Dim, Dim),
+    Clicked(Dim),
     Fetch,
     FetchComplete(Result<String, Error>),
     FetchFailed,
@@ -63,7 +63,7 @@ impl Component for ConnectFourBoard {
 
         ConnectFourBoard {
             link,
-            props: props.clone(),
+            props: props,
             board: HashMap::new(),
             current_token: Token::R,
             game_over: false,
@@ -71,7 +71,7 @@ impl Component for ConnectFourBoard {
             ft: None, //Some(task),
             state,
             console: ConsoleService::new(),
-            bot: Bot::new(props.difficulty)
+            bot: Bot::new()
         }
     }
 
@@ -85,7 +85,7 @@ impl Component for ConnectFourBoard {
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::Clicked(row, col) => {
+            Msg::Clicked(col) => {
                 if !self.game_over {
                     match self.drop(col, self.current_token) {
                         Ok(()) => self.current_token.next(),
@@ -95,11 +95,16 @@ impl Component for ConnectFourBoard {
                     // AI stuff
                     if self.props.player2_name == "Computer" && !self.game_over {
                         self.console.log("Computer turn");
-                        
+                        let depth = match self.props.difficulty {
+                            Difficulty::Easy => 3,
+                            Difficulty::Medium => 4,
+                            Difficulty::Hard => 50
+                        };
+
                         // choose a move until we get a valid column
                         // column is valid only if it's not full
                         loop {
-                            let col_bot = self.bot.get_move(self.board.clone());
+                            let col_bot = self.bot.get_move(self.board.clone(), depth);
                             self.console.log(format!("col_bot: {}", col_bot).as_ref());
                             match self.drop(col_bot, Token::Y) {
                                 Ok(()) => {
@@ -153,7 +158,7 @@ impl Component for ConnectFourBoard {
 
         let col = |r, c| {
             html! {
-                <td class=format!("board_column {}", get_cell_color(r, c)) onclick=self.link.callback(move |_| Msg::Clicked(r, c))>
+                <td class=format!("board_column {}", get_cell_color(r, c)) onclick=self.link.callback(move |_| Msg::Clicked(c))>
                     {draw_token(r, c)}
                 </td>
             }
