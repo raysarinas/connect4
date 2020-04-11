@@ -40,10 +40,7 @@ impl Component for TootOttoComputer {
                     _ => unreachable!()
                 }
             }
-            Msg::StartGame => {
-                self.info_submitted = true;
-                // disable start game button here
-            }
+            Msg::StartGame => self.info_submitted = true
         }
         true
     }
@@ -75,13 +72,19 @@ impl Component for TootOttoComputer {
                         </select>
                     </div>
                     <br></br>
-                    <button onclick=self.link.callback(|_| Msg::StartGame)>{"Start Game"}</button>
+                    <button
+                        disabled=self.info_submitted
+                        onclick=self.link.callback(|_| Msg::StartGame)>
+                        {"Start Game"}
+                    </button>
                 </div>
                 <br></br>
                 <div hidden=!self.info_submitted>
                     <div>
                         <h4>{"New Game: "}{&self.player_name}{" vs. Computer"}</h4>
                         <small>{"(Winning Combination: "}{&self.player_name}{" - "}<b>{"TOOT"}</b>{" and Computer - "}<b>{"OTTO"}</b>{")"}</small>
+                        <br></br>
+                        <small>{"(Disc Colors: "}{&self.player_name}{" - "}<b>{"Green"}</b>{" and Computer - "}<b>{"Yellow"}</b>{")"}</small>
                     </div>
                     <br></br>
                     <TootOttoBoard player1_name=&self.player_name player2_name="Computer", difficulty=self.difficulty />

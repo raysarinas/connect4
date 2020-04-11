@@ -1,4 +1,5 @@
 use crate::connect_four::board::*;
+use crate::game_elements::Difficulty;
 
 use yew::prelude::*;
 
@@ -32,10 +33,7 @@ impl Component for Connect4Human {
         match msg {
             Msg::GotPlayer1Name(name) => self.player1_name = name,
             Msg::GotPlayer2Name(name) => self.player2_name = name,
-            Msg::StartGame => {
-                self.info_submitted = true;
-                // disable start game button here
-            }
+            Msg::StartGame => self.info_submitted = true
         }
         true
     }
@@ -57,7 +55,11 @@ impl Component for Connect4Human {
                             value=&self.player2_name
                             oninput=self.link.callback(|e: InputData| Msg::GotPlayer2Name(e.value))
                             placeholder="Player 2's Name"/>
-                        <button onclick=self.link.callback(|_| Msg::StartGame)>{"Start Game"}</button>
+                        <button
+                            disabled=self.info_submitted
+                            onclick=self.link.callback(|_| Msg::StartGame)>
+                            {"Start Game"}
+                        </button>
                     </div>
                 </div>
                 <br></br>
@@ -65,7 +67,9 @@ impl Component for Connect4Human {
                     <h4>{"New Game: "}{&self.player1_name}{" vs. "}{&self.player2_name}</h4>
                     <small>{"(Disc Colors: "}{&self.player1_name}{" - "}<b>{"Red"}</b>{" and "}{&self.player2_name}{" - "}<b>{"Yellow"}</b>{")"}</small>
                     <br></br>
-                    <ConnectFourBoard />
+                    <small>{"(Disc Type: "}{&self.player1_name}{" - "}<b>{"R"}</b>{" and "}{&self.player2_name}{" - "}<b>{"Y"}</b>{")"}</small>
+                    <br></br>
+                    <ConnectFourBoard player1_name=&self.player1_name player2_name=&self.player2_name, difficulty=&Difficulty::Easy />
                 </div>
             </div>
         }
