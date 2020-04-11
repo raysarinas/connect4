@@ -5,7 +5,7 @@ use yew::format::{Json, Nothing};
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
 use anyhow::Error;
 use bson::UtcDateTime;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Utc, NaiveDateTime};
 use std::collections::HashMap;
 use common::{Game};
 
@@ -67,6 +67,16 @@ impl Component for ScoreBoard {
     
     // VIEW
     fn view(&self) -> Html {
+
+        let parse_date = |date: String| {
+            let ms: i64 = date.parse::<i64>().unwrap();
+            let seconds = (ms / 1000) as i64;
+            let nanos = ((ms % 1000) * 1_000_000) as u32;
+            let naive_datetime = NaiveDateTime::from_timestamp(seconds, nanos);
+            let stamp: DateTime<Utc> = DateTime::from_utc(naive_datetime, Utc);
+            stamp.format("%H:%M on %b %e, %Y").to_string()
+        };
+        
         let comprow = |(index, g): (usize, &Game)| {
             html! {
                 <tr>
@@ -74,7 +84,7 @@ impl Component for ScoreBoard {
                     <td>{g.gameType.clone()}</td>
                     <td>{g.WinnerName.clone()}</td>
                     <td>{g.Player1Name.clone()}</td>
-                    <td>{g.GameDate.clone()}</td>
+                    <td>{parse_date(g.GameDate.clone())}</td>
                 </tr>
             }
         };
@@ -88,6 +98,12 @@ impl Component for ScoreBoard {
                 </tr>
             }
         };
+
+        // let sorted = |map: HashMap<String, usize>| {
+        //     let mut v: Vec<_> = map.iter().collect();
+        //     v.sort_by(|a, b| b.1.cmp(&a.1));
+        //     v
+        // };
 
         html! {
             <div>
@@ -141,6 +157,7 @@ impl Component for ScoreBoard {
                         </tr>
                     </thead>
                         <tbody>
+                        // sorted(map).to_vec()
                             { for self.get_win_map().iter().enumerate().map(winrow) }
                         </tbody>
                     </table>
@@ -153,8 +170,22 @@ impl Component for ScoreBoard {
 impl ScoreBoard {
 
     fn get_agame(val: &str) -> Game {
-        let game: Game = serde_json::from_str(val).unwrap();
-        game
+        let split = val.replace("\"", "")
+                .replace("{_id:{$", "").replace("{$date:{$numberLong:", "").replace("}", "")
+                .split(',')
+                .map(|kv| kv.split(':'))
+                .map(|mut kv| (kv.next().unwrap().into(),
+                            kv.next().unwrap().into()))
+                .collect::<HashMap<String, String>>();
+
+        Game {
+            gameNumber: split["gameNumber"].clone(),
+            gameType: split["gameType"].clone(),
+            Player1Name: split["Player1Name"].clone(),
+            Player2Name: split["Player2Name"].clone(),
+            WinnerName: split["WinnerName"].clone(),
+            GameDate: split["GameDate"].clone(),
+        }
     }
 
     fn get_gamevec(&self) -> Vec<Game> {
@@ -180,6 +211,18 @@ impl ScoreBoard {
     fn get_num_games_total(&self) -> String {
         self.get_gamevec().len().to_string()
     }
+
+    // fn get_win_vec(&self) -> Vec<(String, usize)> {
+    //     let map = self.get_win_map();
+    //     // let mut v: Vec<_> = map.iter().collect();
+    //     // v.sort_by(|a, b| b.1.cmp(&a.1));
+    //     let sorted = |map: HashMap<String, usize>| {
+    //         let mut v: Vec<_> = map.iter().collect();
+    //         v.sort_by(|a, b| b.1.cmp(&a.1));
+    //         v
+    //     };
+    //     sorted(map).to_vec()
+    // }
 
     fn get_win_map(&self) -> HashMap<String, usize> {
         self.get_gamevec().iter()

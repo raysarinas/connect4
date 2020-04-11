@@ -116,7 +116,6 @@ impl Component for GameHistory {
 
 impl GameHistory {
     fn get_agame(val: &str) -> Game {
-        // let game: Game = serde_json::from_str(val).unwrap();
         let split = val.replace("\"", "")
                 .replace("{_id:{$", "").replace("{$date:{$numberLong:", "").replace("}", "")
                 .split(',')
