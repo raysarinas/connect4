@@ -179,7 +179,7 @@ impl Component for ConnectFourBoard {
             Token::Y => &self.props.player2_name
         };
 
-        let get_result = || if self.winner.is_empty() {
+        let get_result = || if self.winner == "Tie" {
             html! { <h1><b>{"It's a draw"}</b></h1> }
         } else {
             html! { <h1><b>{&self.winner}{" wins"}</b></h1> }
@@ -282,6 +282,7 @@ impl ConnectFourBoard {
         }
 
         if self.is_full() {
+            self.winner = "Tie".to_string();
             self.game_over = true;
             self.post_game();
         }
@@ -352,18 +353,13 @@ impl ConnectFourBoard {
 impl State {
     fn post_game(&mut self, props: &Props, winner: &String) -> FetchTask {
         self.console.log("posting game");
-        let winner_str = || if winner.is_empty() {
-            "Tie".to_string()
-        } else {
-            winner.clone()
-        };
 
         let new_game = Game {
             gameNumber: "1".to_string(),
             gameType: "Connect-4".to_string(),
             Player1Name: props.player1_name.clone(),
             Player2Name: props.player2_name.clone(),
-            WinnerName: winner_str(),
+            WinnerName: winner.clone(),
             GameDate: "".to_string(),
         };
 

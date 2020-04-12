@@ -71,7 +71,7 @@ impl Component for TootOttoBoard {
             selected_token: Token::T,
             turn: Turn::First,
             game_over: false,
-            winner: "Tie".to_string(),
+            winner: "".to_string(),
             ft: None, //Some(task),
             state,
             console: ConsoleService::new(),
@@ -394,20 +394,13 @@ impl TootOttoBoard {
 impl State {
     fn post_game(&mut self, props: &Props, winner: &String) -> FetchTask {
         self.console.log("in post game");
-        let winner_str = || if winner.is_empty() {
-            "Tie".to_string()
-        } else {
-            winner.clone()
-        };
-
-        self.console.log(&winner_str());
 
         let new_game = Game {
             gameNumber: "1".to_string(),
             gameType: "TOOT-OTTO".to_string(),
             Player1Name: props.player1_name.clone(),
             Player2Name: props.player2_name.clone(),
-            WinnerName: winner_str(),
+            WinnerName: winner.clone(),
             GameDate: "".to_string(),
         };
 
