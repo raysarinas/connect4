@@ -82,7 +82,7 @@ impl Component for ConnectFourBoard {
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::Clicked(col) => {
-                if !self.game_over {
+                if !self.game_over && !self.is_col_full(col) {
                     match self.drop(col, self.current_token) {
                         Ok(()) => self.current_token.next(),
                         Err(e) => self.console.log(format!("Err {}", e).as_ref())
@@ -249,13 +249,15 @@ impl ConnectFourBoard {
         None
     }
 
+    fn is_col_full(&self, col:Dim) -> bool {
+        self.get_token_at((5, col)).is_some()
+    }
+
     // check if the board is full by checking if there is a token 
     // at every col of the top row
     fn is_full(&self) -> bool {
-        let top_row = 5;
-
         for col in 0..7 {
-            if self.get_token_at((top_row, col)).is_none() {
+            if !self.is_col_full(col) {
                 return false;
             }
         };

@@ -95,7 +95,7 @@ impl Component for TootOttoBoard {
                 }
             },
             Msg::Clicked(col) => {
-                if !self.game_over {
+                if !self.game_over && !self.is_col_full(col) {
                     self.console.log("clicked");
                     match self.drop(col, self.selected_token, self.turn) {
                         Ok(()) => self.turn.next(),
@@ -120,7 +120,7 @@ impl Component for TootOttoBoard {
                             match self.drop(col_bot, token, self.turn) {
                                 Ok(()) => {
                                     self.turn.next();
-                                    break
+                                    break;
                                 },
                                 Err(e) => self.console.log(format!("Err {}", e).as_ref())
                             }
@@ -287,13 +287,15 @@ impl TootOttoBoard {
         None
     }
 
+    fn is_col_full(&self, col:Dim) -> bool {
+        self.get_token_at((3, col)).is_some()
+    }
+
     // check if the board is full by checking if there is a token 
     // at every col of the top row
     fn is_full(&self) -> bool {
-        let top_row = 3;
-
-        for col in 0..6 {
-            if self.get_token_at((top_row, col)).is_none() {
+        for col in 0..7 {
+            if !self.is_col_full(col) {
                 return false;
             }
         };
