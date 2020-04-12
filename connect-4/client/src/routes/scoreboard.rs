@@ -133,7 +133,7 @@ impl Component for ScoreBoard {
                         </tr>
                     </thead>
                         <tbody>
-                        { for self.get_games_computer().iter().enumerate().map(comprow) }
+                        { for self.get_games_won("Computer").iter().enumerate().map(comprow) }
                         </tbody>
                     </table>
                 </div>
@@ -195,8 +195,7 @@ impl ScoreBoard {
 
     fn get_games_computer(&self) -> Vec<Game> {
         self.get_gamevec().into_iter()
-            .filter(|g| g.Player2Name == "Computer".to_string()
-                        && g.WinnerName == "Computer".to_string())
+            .filter(|g| g.Player2Name == "Computer".to_string())
             .collect()
     }
 
