@@ -7,9 +7,9 @@ use std::collections::HashMap;
 use yew::prelude::*;
 use yew::format::Json;
 use yew::services::fetch::{FetchService, FetchTask, Request, Response};
+use yew::services::console::ConsoleService;
 use anyhow::Error;
 use common::Game;
-use yew::services::console::ConsoleService;
 
 pub struct ConnectFourBoard {
     link: ComponentLink<Self>,
