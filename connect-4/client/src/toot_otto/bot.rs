@@ -1,5 +1,5 @@
 use crate::game_elements::*;
-use crate::connect_four::*;
+use crate::toot_otto::*;
 
 use std::collections::HashMap;
 use std::cmp::{max, min};
@@ -9,8 +9,8 @@ use yew::services::console::ConsoleService;
 pub type GameBoard = HashMap<Coord, Token>;
 
 const AI_MOVE_VALUE: isize = -1;
-const ROWS: isize = 6;
-const COLS: isize = 7;
+const ROWS: isize = 4;
+const COLS: isize = 6;
 
 pub struct Bot {
     token: Token,
@@ -22,7 +22,7 @@ pub struct Bot {
 impl Bot {
     pub fn new() -> Self {
         Bot {
-            token: Token::Y,
+            token: Token::T,
             depth: 0,
             board: HashMap::new(),
             console: ConsoleService::new()
@@ -178,7 +178,7 @@ impl Bot {
         let addr = &temp as *const Vec<i32>;
         let index = addr as usize;
         if choices.len() == 0 {
-            return ((index % 7) as isize).abs()
+            return ((index % 6) as isize).abs()
         }
         choices[index % choices.len()].abs()
     }
@@ -223,7 +223,7 @@ impl Bot {
 
         // for each column
         for j in 0..COLS {
-            let inserted = self.insert_in_col(j, Token::R);
+            let inserted = self.insert_in_col(j, Token::O);
             if inserted {
                 let (temp_val, _) = self.value(depth, alpha, beta);
                 if temp_val < v {

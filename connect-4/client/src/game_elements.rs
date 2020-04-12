@@ -12,18 +12,3 @@ pub enum Difficulty {
     Medium,
     Hard
 }
-
-#[derive(Clone, PartialEq, Hash, Eq, Copy)]
-pub enum Turn {
-    First,
-    Second,
-}
-
-impl Turn {
-    pub fn next(&mut self) {
-        match self {
-            Turn::First => *self = Turn::Second,
-            Turn::Second => *self = Turn::First,
-        }
-    }
-}

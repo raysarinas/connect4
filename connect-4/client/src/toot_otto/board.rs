@@ -1,4 +1,6 @@
 use crate::game_elements::*;
+use crate::toot_otto::*;
+use crate::toot_otto::bot::Bot;
 
 use std::collections::{HashSet, HashMap};
 
@@ -21,6 +23,7 @@ pub struct TootOttoBoard {
     ft: Option<FetchTask>,
     state: State,
     console: ConsoleService,
+    bot: Bot,
 }
 
 pub struct State {
@@ -30,15 +33,9 @@ pub struct State {
     console: ConsoleService,
 }
 
-#[derive(Clone, PartialEq, Hash, Eq, Copy)]
-pub enum Token {
-    T,
-    O
-}
-
 pub enum Msg {
     GotToken(Token),
-    Clicked(Dim, Dim),
+    Clicked(Dim),
     Fetch,
     FetchComplete(Result<String, Error>),
     FetchFailed,
@@ -75,6 +72,7 @@ impl Component for TootOttoBoard {
             ft: None, //Some(task),
             state,
             console: ConsoleService::new(),
+            bot: Bot::new()
         }
     }
 
@@ -96,15 +94,37 @@ impl Component for TootOttoBoard {
                     
                 }
             },
-            Msg::Clicked(row, col) => {
+            Msg::Clicked(col) => {
                 if !self.game_over {
                     self.console.log("clicked");
                     match self.drop(col, self.selected_token, self.turn) {
                         Ok(()) => self.turn.next(),
-                        Err(e) => println!("Err: {}", e), // TODO: do something with this
+                        Err(e) => self.console.log(format!("Err {}", e).as_ref())
                     }
 
-                    // if self.props.player2_name == "Computer", make ai move here i guess
+                    // AI stuff
+                    if self.props.player2_name == "Computer" && !self.game_over {
+                        self.console.log("Computer turn");
+                        let depth = match self.props.difficulty {
+                            Difficulty::Easy => 3,
+                            Difficulty::Medium => 4,
+                            Difficulty::Hard => 50
+                        };
+
+                        // choose a move until we get a valid column
+                        // column is valid only if it's not full
+                        loop {
+                            let col_bot = self.bot.get_move(self.board.clone(), depth); // TODO: get token
+                            self.console.log(format!("col_bot: {}", col_bot).as_ref());
+                            match self.drop(col_bot, Token::T, Turn::Second) {
+                                Ok(()) => {
+                                    self.turn.next();
+                                    break;
+                                },
+                                Err(e) => self.console.log(format!("Err {}", e).as_ref())
+                            }
+                        }
+                    }
                 }
             },
             Msg::Fetch => {
@@ -149,7 +169,7 @@ impl Component for TootOttoBoard {
 
         let col = |r, c| {
             html! {
-                <td class=format!("board_column {}", get_cell_color(r, c)) onclick=self.link.callback(move |_| Msg::Clicked(r, c))>
+                <td class=format!("board_column {}", get_cell_color(r, c)) onclick=self.link.callback(move |_| Msg::Clicked(c))>
                     {draw_token(r, c)}
                 </td>
             }
