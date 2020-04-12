@@ -147,6 +147,7 @@ dependencies = [
  "failure",
  "serde",
  "serde_json",
+ "stdweb",
  "yew",
  "yew-router",
 ]

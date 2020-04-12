@@ -1,4 +1,6 @@
 use crate::game_elements::*;
+use crate::toot_otto::*;
+use crate::toot_otto::bot::Bot;
 
 use std::collections::{HashSet, HashMap};
 
@@ -21,6 +23,7 @@ pub struct TootOttoBoard {
     ft: Option<FetchTask>,
     state: State,
     console: ConsoleService,
+    bot: Bot,
 }
 
 pub struct State {
@@ -30,11 +33,6 @@ pub struct State {
     console: ConsoleService,
 }
 
-#[derive(Clone, PartialEq, Hash, Eq, Copy)]
-pub enum Token {
-    T,
-    O
-}
 
 pub enum Msg {
     GotToken(Token),
@@ -75,6 +73,7 @@ impl Component for TootOttoBoard {
             ft: None, //Some(task),
             state,
             console: ConsoleService::new(),
+            bot: Bot::new()
         }
     }
 
@@ -104,7 +103,29 @@ impl Component for TootOttoBoard {
                         Err(e) => println!("Err: {}", e), // TODO: do something with this
                     }
 
-                    // if self.props.player2_name == "Computer", make ai move here i guess
+                    if self.props.player2_name == "Computer" && !self.game_over {
+                        self.console.log("Computer turn");
+                        let depth = match self.props.difficulty {
+                            Difficulty::Easy => 3,
+                            Difficulty::Medium => 4,
+                            Difficulty::Hard => 50
+                        };
+
+                        // choose a move until we get a valid column
+                        // column is valid only if it's not full
+                        loop {
+                            let col_bot = self.bot.get_move(self.board.clone(), depth);
+                            self.console.log(format!("col_bot: {}", col_bot).as_ref());
+                            let token = self.bot.get_token();
+                            match self.drop(col_bot, token, self.turn) {
+                                Ok(()) => {
+                                    self.turn.next();
+                                    break
+                                },
+                                Err(e) => self.console.log(format!("Err {}", e).as_ref())
+                            }
+                        }
+                    }
                 }
             },
             Msg::Fetch => {
