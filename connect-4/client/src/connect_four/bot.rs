@@ -52,7 +52,7 @@ impl Bot {
     fn match_ai_token(&self, row: isize, col: isize) -> isize {
         if self.token_is_at((row, col), &self.token) { // AI is negative
             -1 // AI Token
-        } else if !self.token_is_at((row, col), &self.token) {
+        } else if self.board.get(&(row, col)).is_none() {
             0 // Blank space
         } else {
             1 // Player's Token
@@ -77,7 +77,7 @@ impl Bot {
             }
         }
 
-        if row < 0 {    // theoretically, should never get here
+        if row < 0 {    // theoretically, should never be true
             return false;
         }
         
