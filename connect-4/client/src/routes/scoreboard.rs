@@ -69,9 +69,10 @@ impl Component for ScoreBoard {
             let ms: i64 = date.parse::<i64>().unwrap();
             let seconds = (ms / 1000) as i64;
             let nanos = ((ms % 1000) * 1_000_000) as u32;
-            let naive_datetime = NaiveDateTime::from_timestamp(seconds, nanos);
+            let timezone_offset = 3600 * -6; // -6 is MST
+            let naive_datetime = NaiveDateTime::from_timestamp(seconds + timezone_offset, nanos);
             let stamp: DateTime<Utc> = DateTime::from_utc(naive_datetime, Utc);
-            stamp.format("%H:%M on %b %e, %Y").to_string()
+            stamp.format("%I:%M %p on %b %e, %Y").to_string()
         };
         
         let comprow = |(index, g): (usize, &Game)| {
@@ -194,7 +195,8 @@ impl ScoreBoard {
 
     fn get_games_computer(&self) -> Vec<Game> {
         self.get_gamevec().into_iter()
-            .filter(|g| g.Player2Name == "Computer".to_string())
+            .filter(|g| g.Player2Name == "Computer".to_string()
+                        && g.WinnerName == "Computer".to_string())
             .collect()
     }
 

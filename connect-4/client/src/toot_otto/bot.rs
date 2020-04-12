@@ -9,6 +9,10 @@ use yew::services::console::ConsoleService;
 
 pub type GameBoard = HashMap<Coord, Token>;
 
+const AI_MOVE_VALUE: isize = -1;
+const ROWS: isize = 4;
+const COLS: isize = 6;
+
 pub struct Bot {
     token: Token,
     depth: isize,
@@ -17,11 +21,9 @@ pub struct Bot {
 }
 
 impl Bot {
-    const AI_MOVE_VALUE: isize = -1;
-
     pub fn new() -> Self {
         Bot {
-            token: Token::O,
+            token: Token::T,
             depth: 0,
             board: HashMap::new(),
             console: ConsoleService::new()
@@ -80,10 +82,10 @@ impl Bot {
 
     // return true if was able to 
     fn insert_in_col(&mut self, col: isize, token: Token) -> bool {
-        let top_row = 3;
+        let top_row = ROWS - 1;
 
         // if top row is filled, or if col is invalid, can't modify column
-        if self.board.get(&(top_row, col)).is_some() || col < 0 || col > 6 {
+        if self.board.get(&(top_row, col)).is_some() || col < 0 || col > COLS - 1 {
             return false;
         }
 
@@ -106,13 +108,11 @@ impl Bot {
     }
 
     fn check_state(&self) -> (isize, isize) {
-        let rows = 4; // 4, i
-        let cols = 6; // 6, j
         let mut win_val = 0;
         let mut chain_val = 0;
 
-        for i in 0..rows {
-            for j in 0..cols {
+        for i in 0..ROWS {
+            for j in 0..COLS {
                 let mut temp_r = 0;
                 let mut temp_t = 0;
                 let mut temp_tr = 0;
@@ -120,22 +120,22 @@ impl Bot {
                 for k in 0..4 {
 
                     // from (i,j) to right
-                    if j + k < cols {
+                    if j + k < COLS {
                         temp_r += self.match_ai_token(i, j + k);
                     }
 
                     // from (i,j) to top
-                    if i + k < rows {
+                    if i + k < ROWS {
                         temp_t += self.match_ai_token(i + k, j);
                     }
 
                     // from (i,j) to top-right
-                    if i + k < rows && j + k < cols {
+                    if i + k < ROWS && j + k < COLS {
                         temp_tr += self.match_ai_token(i + k, j + k);
                     }
 
                     // from (i,j) to bottom-right
-                    if i - k >= 0 && j + k < cols {
+                    if i - k >= 0 && j + k < COLS {
                         temp_br += self.match_ai_token(i - k, j + k);
                     }
                 }
@@ -164,11 +164,11 @@ impl Bot {
 
         // if slow (or memory consumption is high), lower the value
         if depth >= 4 {
-            let mut ret_value = chain_val * Bot::AI_MOVE_VALUE;
+            let mut ret_value = chain_val * AI_MOVE_VALUE;
 
-            if win_val == 4 * Bot::AI_MOVE_VALUE {
+            if win_val == 4 * AI_MOVE_VALUE {
                 ret_value = 999999;
-            } else if win_val == 4 * Bot::AI_MOVE_VALUE * -1 {
+            } else if win_val == 4 * AI_MOVE_VALUE * -1 {
                 ret_value = -999999;
             }
 
@@ -177,11 +177,11 @@ impl Bot {
         }
 
         // AI won
-        if win_val == 4 * Bot::AI_MOVE_VALUE {
+        if win_val == 4 * AI_MOVE_VALUE {
             return (999999 - depth * depth, -1 as isize)
         }
         // AI lost
-        if win_val == 4 * Bot::AI_MOVE_VALUE * -1 {
+        if win_val == 4 * AI_MOVE_VALUE * -1 {
             return (-999999 - depth * depth, -1 as isize)
         }
 
@@ -208,7 +208,7 @@ impl Bot {
         let mut move_queue = Vec::new();
 
         // for each column
-        for j in 0..6 {
+        for j in 0..COLS {
             let inserted = self.insert_in_col(j, self.token);
             if inserted {
                 let (temp_val, _) = self.value(depth, alpha, beta);
@@ -246,7 +246,7 @@ impl Bot {
         }
 
         // for each column
-        for j in 0..6 {
+        for j in 0..COLS {
             let inserted = self.insert_in_col(j, token);
             if inserted {
                 let (temp_val, _) = self.value(depth, alpha, beta);

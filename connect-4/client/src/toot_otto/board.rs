@@ -33,10 +33,9 @@ pub struct State {
     console: ConsoleService,
 }
 
-
 pub enum Msg {
     GotToken(Token),
-    Clicked(Dim, Dim),
+    Clicked(Dim),
     Fetch,
     FetchComplete(Result<String, Error>),
     FetchFailed,
@@ -95,14 +94,15 @@ impl Component for TootOttoBoard {
                     
                 }
             },
-            Msg::Clicked(row, col) => {
+            Msg::Clicked(col) => {
                 if !self.game_over {
                     self.console.log("clicked");
                     match self.drop(col, self.selected_token, self.turn) {
                         Ok(()) => self.turn.next(),
-                        Err(e) => println!("Err: {}", e), // TODO: do something with this
+                        Err(e) => self.console.log(format!("Err {}", e).as_ref())
                     }
 
+                    // AI stuff
                     if self.props.player2_name == "Computer" && !self.game_over {
                         self.console.log("Computer turn");
                         let depth = match self.props.difficulty {
@@ -170,7 +170,7 @@ impl Component for TootOttoBoard {
 
         let col = |r, c| {
             html! {
-                <td class=format!("board_column {}", get_cell_color(r, c)) onclick=self.link.callback(move |_| Msg::Clicked(r, c))>
+                <td class=format!("board_column {}", get_cell_color(r, c)) onclick=self.link.callback(move |_| Msg::Clicked(c))>
                     {draw_token(r, c)}
                 </td>
             }
