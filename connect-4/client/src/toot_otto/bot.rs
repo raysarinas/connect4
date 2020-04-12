@@ -70,6 +70,10 @@ impl Bot {
         }
     }
 
+    fn is_col_full(&self, col:Dim) -> bool {
+        self.board.get(&(ROWS - 1, col)).is_some()
+    }
+
     fn match_ai_token(&self, row: isize, col: isize) -> isize {
         if self.token_is_at((row, col), &self.token) { // AI is negative
             -1 // AI Token
@@ -85,7 +89,7 @@ impl Bot {
         let top_row = ROWS - 1;
 
         // if top row is filled, or if col is invalid, can't modify column
-        if self.board.get(&(top_row, col)).is_some() || col < 0 || col > COLS - 1 {
+        if self.is_col_full(col) || col < 0 || col > COLS - 1 {
             return false;
         }
 
@@ -197,7 +201,11 @@ impl Bot {
         let addr = &temp as *const Vec<i32>;
         let index = addr as usize;
         if choices.len() == 0 {
-            return ((index % 6) as isize).abs()
+            for i in 0..COLS {
+                if !self.is_col_full(i) {
+                    return i;
+                }
+            }
         }
         choices[index % choices.len()].abs()
     }

@@ -294,7 +294,7 @@ impl TootOttoBoard {
     // check if the board is full by checking if there is a token 
     // at every col of the top row
     fn is_full(&self) -> bool {
-        for col in 0..7 {
+        for col in 0..6 {
             if !self.is_col_full(col) {
                 return false;
             }
