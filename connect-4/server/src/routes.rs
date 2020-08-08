@@ -15,7 +15,7 @@ pub fn get_all_games(conn: Mongoose) -> Json<Vec<String>> {
     let cursor = coll
                     .find(Some(doc! {}), None)
                     .ok()
-                    .expect("Failed to execute find.");
+                    .expect("failed to execute find.");
     let mut contents = Vec::new();
     
     for item in cursor {
