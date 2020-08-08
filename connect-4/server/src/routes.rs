@@ -38,7 +38,7 @@ pub fn create_game(conn: Mongoose, game: Json<Game>) -> Json<String> {
         "Player1Name": inner.Player1Name,
         "Player2Name": inner.Player2Name,
         "WinnerName": inner.WinnerName,
-        "GameDate": Bson::UtcDatetime(Utc::now()),//Bson::UtcDatetime(inner.GameDate.0),
+        "GameDate": Bson::UtcDatetime(Utc::now()),
     };
 
     let created = doc.clone();
